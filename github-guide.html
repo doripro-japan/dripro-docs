@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub運用ガイド | ドリームプロジェクトジャパン</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap');
+  :root {
+    --dark: #1A2A3A; --mid: #4A5568; --light: #8896A8; --bg: #F8FAFC; --white: #FFFFFF; --border: #E8EDF2;
+    --orange: #F7B759; --mint: #8EC7C4; --coral: #ED848D; --sky: #ACD4E6; --lavender: #D9BAD6; --sand: #F7DB84; --yellow: #F5E033;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--dark); line-height: 1.8; }
+  .hero { background: var(--dark); color: var(--white); padding: 64px 24px 48px; text-align: center; position: relative; }
+  .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #D9BAD6, #ACD4E6, #8EC7C4, #F5E033, #F7B759, #ED848D, #F7DB84); }
+  .hero-label { display: inline-block; background: var(--sky); color: var(--dark); font-size: 11px; font-weight: 700; letter-spacing: 2px; padding: 4px 16px; border-radius: 20px; margin-bottom: 20px; }
+  .hero h1 { font-size: clamp(22px, 5vw, 36px); font-weight: 900; line-height: 1.3; margin-bottom: 12px; }
+  .hero h1 span { color: var(--sky); }
+  .hero p { font-size: 14px; color: #94A3B8; max-width: 520px; margin: 0 auto; }
+  .hero-meta { font-size: 12px; color: #64748B; margin-top: 20px; }
+  .quick-summary { background: linear-gradient(135deg, #1A2A3A 0%, #2D4A6A 100%); border-left: 4px solid var(--sky); padding: 28px 24px; }
+  .quick-summary-inner { max-width: 860px; margin: 0 auto; }
+  .quick-summary h2 { font-size: 13px; font-weight: 700; color: var(--sky); letter-spacing: 2px; margin-bottom: 14px; }
+  .summary-items { display: flex; flex-direction: column; gap: 10px; }
+  .summary-item { display: flex; align-items: flex-start; gap: 12px; color: var(--white); font-size: 14px; line-height: 1.6; }
+  .summary-num { background: var(--sky); color: var(--dark); font-size: 11px; font-weight: 700; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .safe-banner { background: #E5F5F4; border-bottom: 1px solid var(--mint); padding: 14px 24px; text-align: center; font-size: 13px; color: #1A5A58; font-weight: 500; }
+  .nav { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 100; display: flex; overflow-x: auto; scrollbar-width: none; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav a { padding: 14px 14px; font-size: 12px; font-weight: 500; color: var(--light); text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .nav a:hover { color: var(--dark); border-color: var(--sky); }
+  .section { max-width: 860px; margin: 0 auto; padding: 48px 24px; }
+  .section-label { font-size: 11px; font-weight: 700; color: var(--sky); letter-spacing: 2px; margin-bottom: 8px; }
+  .section h2 { font-size: clamp(18px, 4vw, 24px); font-weight: 700; margin-bottom: 8px; }
+  .section-sub { font-size: 13px; color: var(--mid); margin-bottom: 32px; padding-bottom: 16px; border-bottom: 2px solid var(--border); line-height: 1.8; }
+  .highlight { background: #FEF4E2; border: 1px solid var(--orange); border-left: 4px solid var(--orange); border-radius: 0 10px 10px 0; padding: 18px 22px; margin-bottom: 20px; }
+  .highlight h4 { font-size: 13px; font-weight: 700; color: #7A4A10; margin-bottom: 8px; }
+  .highlight p { font-size: 13px; color: #7A4A10; line-height: 1.7; }
+  .note { background: #E5F5F4; border: 1px solid var(--mint); border-left: 4px solid var(--mint); border-radius: 0 10px 10px 0; padding: 18px 22px; margin-bottom: 20px; }
+  .note h4 { font-size: 13px; font-weight: 700; color: #1A5A58; margin-bottom: 8px; }
+  .note p { font-size: 13px; color: #1A5A58; line-height: 1.7; }
+  .big-rule { background: linear-gradient(135deg, #FFF9C4 0%, #FFF176 100%); border: 2px solid #FFC107; border-radius: 12px; padding: 28px; text-align: center; margin: 24px 0 32px; }
+  .big-rule .stars { font-size: 14px; color: #F57F17; font-weight: 700; margin-bottom: 8px; letter-spacing: 4px; }
+  .big-rule .main-text { font-size: 18px; font-weight: 900; color: #5D4037; line-height: 1.5; margin-bottom: 8px; }
+  .big-rule .sub-text { font-size: 13px; color: #795548; }
+  .compare { background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+  .compare table { width: 100%; border-collapse: collapse; min-width: 480px; }
+  .compare th { background: var(--dark); color: var(--white); font-size: 12px; font-weight: 600; padding: 12px 16px; text-align: left; }
+  .compare td { padding: 12px 16px; font-size: 12px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.6; }
+  .compare tr:last-child td { border-bottom: none; }
+  .compare tr:nth-child(even) td { background: var(--bg); }
+  .compare .label { font-weight: 600; }
+  .story-box { border-radius: 12px; padding: 20px; margin: 16px 0; }
+  .story-box.good { background: #E8F5E9; border-left: 5px solid #4CAF50; }
+  .story-box.bad { background: #FFEBEE; border-left: 5px solid #E53935; }
+  .story-box.solution { background: #E3F2FD; border-left: 5px solid #1565C0; }
+  .story-box h4 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+  .story-box p { font-size: 13px; line-height: 1.8; margin-bottom: 6px; }
+  .timeline { background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; margin: 20px 0; }
+  .timeline table { width: 100%; border-collapse: collapse; min-width: 600px; }
+  .timeline th { background: var(--dark); color: var(--white); font-size: 12px; padding: 10px 14px; text-align: left; }
+  .timeline td { padding: 10px 14px; font-size: 12px; border-bottom: 1px solid var(--border); line-height: 1.6; }
+  .timeline tr:last-child td { border-bottom: none; }
+  .timeline .work-row td { background: #F5F5F5; color: #999; font-style: italic; }
+  .timeline .highlight-row td { background: #FFF9C4; }
+  .rule-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 20px 0; }
+  .rule-card { border-radius: 12px; padding: 20px; display: flex; gap: 14px; align-items: flex-start; }
+  .rule-card.blue { background: #E3F2FD; border: 1px solid #BBDEFB; }
+  .rule-card.green { background: #E8F5E9; border: 1px solid #C8E6C9; }
+  .rule-card.amber { background: #FFF3E0; border: 1px solid #FFE0B2; }
+  .rule-num { font-size: 28px; font-weight: 900; line-height: 1; flex-shrink: 0; }
+  .rule-card.blue .rule-num { color: #1565C0; }
+  .rule-card.green .rule-num { color: #2E7D32; }
+  .rule-card.amber .rule-num { color: #E65100; }
+  .rule-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .rule-card p { font-size: 12px; color: var(--mid); line-height: 1.6; }
+  .gh-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+  .gh-btn { background: var(--white); border: 2px solid var(--border); border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 200px; }
+  .gh-btn .num { font-size: 20px; font-weight: 900; color: var(--dark); margin-bottom: 4px; }
+  .gh-btn .name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .gh-btn .desc { font-size: 11px; color: var(--mid); line-height: 1.5; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+  .accordion { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 20px 0; }
+  .accordion-item { border-bottom: 1px solid var(--border); }
+  .accordion-item:last-child { border-bottom: none; }
+  .accordion-btn { width: 100%; background: var(--white); border: none; padding: 14px 18px; text-align: left; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--dark); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .accordion-btn:hover { background: var(--bg); }
+  .accordion-btn .arrow { font-size: 11px; color: var(--light); transition: transform 0.3s; }
+  .accordion-btn.open .arrow { transform: rotate(180deg); }
+  .accordion-content { display: none; padding: 0 18px 16px; font-size: 13px; color: var(--mid); line-height: 1.8; }
+  .accordion-content.open { display: block; }
+  footer { background: var(--dark); color: #94A3B8; text-align: center; padding: 32px 24px; font-size: 12px; line-height: 2; }
+  footer strong { color: var(--white); }
+  @media (max-width: 600px) { .rule-cards { grid-template-columns: 1fr; } .gh-buttons { flex-direction: column; } }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-label">DREAM PROJECT JAPAN 開発メンバー向け</div>
+  <h1>みんなで<span>安全にコード</span>を更新するルール</h1>
+  <p>GitHub運用ガイド — Pull/Pushの仕組みと1日の流れ</p>
+  <div class="hero-meta">最終更新：2026年3月 ／ ドリームプロジェクトジャパン株式会社</div>
+</div>
+
+<div class="quick-summary">
+  <div class="quick-summary-inner">
+    <h2>30秒でわかるまとめ</h2>
+    <div class="summary-items">
+      <div class="summary-item"><div class="summary-num">1</div><div>「ホームページ更新して」と言えば、Claude Codeが<strong>自動でPull（最新取得）→ Push（反映）</strong>をやります。仕組みを知らなくても大丈夫。</div></div>
+      <div class="summary-item"><div class="summary-num">2</div><div>作業を始める前に<strong>「最新を取ってきて」</strong>と言うと、他の人の変更を取り込んだ状態で作業できます。</div></div>
+      <div class="summary-item"><div class="summary-num">3</div><div>万が一衝突しても、Claude Codeが「どちらを残しますか？」と聞いてくれます。<strong>自分で解決する必要はありません。</strong></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="safe-banner"><strong>失敗しても大丈夫。</strong> GitHubは全ての変更履歴を保存しています。いつでも前の状態に戻せます。</div>
+
+<nav class="nav">
+  <a href="#about">GitHubとは</a>
+  <a href="#words">用語</a>
+  <a href="#rule">一番大事なルール</a>
+  <a href="#fridge">冷蔵庫の例え</a>
+  <a href="#daily">1日の流れ</a>
+  <a href="#auto">自動Pull+Push</a>
+  <a href="#conflict">衝突したら</a>
+  <a href="#desktop">GitHub Desktop</a>
+  <a href="#summary">まとめ</a>
+  <a href="#faq">Q&A</a>
+</nav>
+
+<section id="about" class="section">
+  <div class="section-label">CHAPTER 01</div>
+  <h2>GitHubのイメージ — Googleドキュメントとの比較</h2>
+  <p class="section-sub">GitHubは、チームでコードを管理するためのサービスです。身近な「Googleドキュメント」との比較で理解しましょう。</p>
+  <div class="compare"><table>
+    <tr><th style="width:28%">比べるポイント</th><th>Googleドキュメント</th><th>GitHub</th></tr>
+    <tr><td class="label">保存場所</td><td>クラウド上で直接編集する</td><td><strong>自分のPCで編集→アップロードする</strong></td></tr>
+    <tr><td class="label">同時編集</td><td>リアルタイムで全員に反映される</td><td><strong>アップロード（Push）した時に反映される</strong></td></tr>
+    <tr><td class="label">元に戻す</td><td>「版の管理」で過去に戻れる</td><td><strong>セーブポイント（コミット）で戻れる</strong></td></tr>
+    <tr><td class="label">共有方法</td><td>リンクを送る</td><td><strong>全員が同じ場所（main）を見る</strong></td></tr>
+    <tr><td class="label">一言でいうと</td><td>同時に書ける共有ノート</td><td><strong>順番に書く共有ノート</strong></td></tr>
+  </table></div>
+  <div class="note"><h4>ポイント</h4><p>Googleドキュメントは「同時に書ける」。GitHubは「順番に書く」。<br>だから<strong>書く前に「今の最新版を見せて」と確認する</strong>のが大事、というだけの話です。</p></div>
+</section>
+<hr class="divider">
+
+<section id="words" class="section">
+  <div class="section-label">CHAPTER 02</div>
+  <h2>用語の言い換え表 — こう言えばOK</h2>
+  <p class="section-sub">Claude Codeに伝える時、どれでも通じます。自分が言いやすい言葉でOK。</p>
+  <div class="compare"><table>
+    <tr><th>操作</th><th>こう言えばOK（どれでも通じます）</th><th>何が起きる？</th></tr>
+    <tr><td class="label">Pull（プル）</td><td>「最新を取ってきて」「プルして」<br>「作業する準備して」「ダウンロードして」</td><td>GitHubから最新版を自分のPCに取得する</td></tr>
+    <tr><td class="label">Push（プッシュ）</td><td>「ホームページ更新して」「反映して」<br>「プッシュして」「アップロードして」</td><td>自分の変更をGitHubに送る → ホームページに自動反映</td></tr>
+    <tr><td class="label">Commit（コミット）</td><td>「セーブポイント作って」「保存して」<br>「コミットして」「記録して」</td><td>変更内容を記録する（まだアップロードはしない）</td></tr>
+    <tr><td class="label">Fetch（フェッチ）</td><td>「確認して」「チェックして」<br>「新しい変更ある？」</td><td>GitHubに新しい変更がないか確認する</td></tr>
+    <tr><td class="label">コンフリクト</td><td>「衝突」「ぶつかった」<br>「かぶった」</td><td>2人が同じ場所を変更した時に起きる</td></tr>
+  </table></div>
+</section>
+<hr class="divider">
+
+<section id="rule" class="section">
+  <div class="section-label">CHAPTER 03</div>
+  <h2>一番大事なルール</h2>
+  <p class="section-sub">このガイドで覚えることは、実はこれだけです。</p>
+  <div class="big-rule">
+    <div class="stars">★★★ これだけ覚えてください ★★★</div>
+    <div class="main-text">「ホームページ更新して」と言う前に<br>「最新を取ってきて」と言う</div>
+    <div class="sub-text">Claude Codeに言うだけでOKです。</div>
+  </div>
+  <div class="note"><h4>実は、もっと簡単です</h4><p>「ホームページ更新して」と言えば、Claude Codeが<strong>自動でPull（最新取得）してからPush（反映）</strong>します。つまり忘れても大丈夫。でも仕組みを知っておくと、トラブル時に安心です。</p></div>
+</section>
+<hr class="divider">
+
+<section id="fridge" class="section">
+  <div class="section-label">CHAPTER 04</div>
+  <h2>なぜ「最新を取る」が必要？ — 共有冷蔵庫の例え</h2>
+  <p class="section-sub">会社の共有冷蔵庫に「買い物リスト」が貼ってあるとイメージしてください。</p>
+  <div class="story-box good"><h4>✅ うまくいくパターン</h4><p>① 朝、杉山さんがリストを見る →「牛乳・卵」と書いてある</p><p>② 杉山さんが「パン」を追記 → リストは「牛乳・卵・パン」</p><p>③ 午後、谷口さんがリストを<strong>見てから</strong>「チーズ」を追記</p><p>④ リストは「牛乳・卵・パン・チーズ」→ <strong>全員の変更が残っている！</strong></p></div>
+  <div class="story-box bad"><h4>❌ 困るパターン</h4><p>① 朝、杉山さんがリストを見る →「牛乳・卵」</p><p>② 朝、福冨さんもリストを見る →「牛乳・卵」</p><p>③ 杉山さんが「パン」を追記して貼り直す →「牛乳・卵・パン」</p><p>④ 福冨さんが<strong>リストを見ないまま</strong>「チーズ」を追記 →「牛乳・卵・チーズ」</p><p>→ <strong>杉山さんの「パン」が消えた！</strong></p></div>
+  <div class="story-box solution"><h4>💡 解決策</h4><p>④の前に、福冨さんが<strong>「今のリスト見せて」と確認する</strong></p><p>→「牛乳・卵・パン」を確認してから「チーズ」を追記</p><p>→ リストは「牛乳・卵・パン・チーズ」✅</p><p style="margin-top:12px; font-weight:700;">GitHubでの「今のリスト見せて」＝「最新を取ってきて」（Pull）です。</p></div>
+</section>
+<hr class="divider">
+
+<section id="daily" class="section">
+  <div class="section-label">CHAPTER 05</div>
+  <h2>1日の流れ — 具体例</h2>
+  <p class="section-sub">実際の1日をシミュレーションしてみましょう。</p>
+  <h3 style="font-size:15px; margin-bottom:12px;">正しい流れ（これを真似してください）</h3>
+  <div class="timeline"><table>
+    <tr><th style="width:14%">時刻</th><th style="width:14%">担当</th><th>やること</th><th style="width:12%">操作</th><th style="width:8%">結果</th></tr>
+    <tr><td><strong>9:00</strong></td><td>福冨</td><td>「最新を取ってきて」</td><td>Pull</td><td>✅</td></tr>
+    <tr><td><strong>9:00</strong></td><td>杉山</td><td>「最新を取ってきて」</td><td>Pull</td><td>✅</td></tr>
+    <tr class="work-row"><td>9:00〜12:00</td><td>杉山</td><td>作業中...</td><td></td><td></td></tr>
+    <tr><td><strong>12:00</strong></td><td>杉山</td><td>「ホームページ更新して」→ 自動Pull+Push</td><td>Pull+Push</td><td>✅</td></tr>
+    <tr><td><strong>13:00</strong></td><td>谷口</td><td>「最新を取ってきて」→ 杉山の変更が反映された状態で開始</td><td>Pull</td><td>✅</td></tr>
+    <tr class="work-row"><td>13:00〜17:00</td><td>谷口</td><td>作業中...</td><td></td><td></td></tr>
+    <tr><td><strong>17:00</strong></td><td>谷口</td><td>「ホームページ更新して」→ 自動Pull+Push</td><td>Pull+Push</td><td>✅</td></tr>
+    <tr><td><strong>19:00</strong></td><td>福冨</td><td>「ホームページ更新して」→ 全員の変更と合体して反映</td><td>Pull+Push</td><td>✅</td></tr>
+  </table></div>
+
+  <h3 style="font-size:15px; margin: 24px 0 12px;">注意が必要な流れ（福冨×杉山が同時作業）</h3>
+  <div class="timeline"><table>
+    <tr><th style="width:14%">時刻</th><th style="width:14%">担当</th><th>やること</th><th style="width:8%">結果</th></tr>
+    <tr><td><strong>9:00</strong></td><td>福冨</td><td>Pull</td><td>✅</td></tr>
+    <tr><td><strong>9:00</strong></td><td>杉山</td><td>Pull</td><td>✅</td></tr>
+    <tr><td><strong>12:00</strong></td><td>杉山</td><td>Push</td><td>✅</td></tr>
+    <tr class="highlight-row"><td><strong>15:00</strong></td><td>福冨</td><td>「ホームページ更新して」→ Claude Codeが自動Pull → 杉山の変更と合体 → Push</td><td>✅</td></tr>
+  </table></div>
+  <div class="highlight"><h4>ポイント</h4><p>15:00に福冨さんがPushする時、Claude Codeが自動でPullして杉山さんの変更を取り込みます。別のファイルや別の行を変更していた場合は<strong>自動で合体されるので何も起きません</strong>。</p></div>
+</section>
+<hr class="divider">
+
+<section id="auto" class="section">
+  <div class="section-label">CHAPTER 06</div>
+  <h2>実は自動でやってくれます</h2>
+  <p class="section-sub">PullとPushを別々に覚える必要はありません。</p>
+  <div class="big-rule">
+    <div class="main-text">「ホームページ更新して」と言えば<br>Claude Codeが自動で<br>Pull（最新取得）→ Push（反映）をやります</div>
+    <div class="sub-text">仕組みを知っておくと「なぜそうするのか」がわかるので、トラブル時に安心です。</div>
+  </div>
+  <div class="note"><h4>じゃあ「最新を取ってきて」は何のため？</h4><p><strong>作業開始時に最新の状態で始められる</strong>ためです。他の人が変更した後のコードで作業した方が効率がいいですし、無用な衝突を避けられます。忘れてもPush時に自動で取り込むので致命的ではありませんが、習慣にしておくのがおすすめです。</p></div>
+</section>
+<hr class="divider">
+
+<section id="conflict" class="section">
+  <div class="section-label">CHAPTER 07</div>
+  <h2>衝突（コンフリクト）が起きたらどうする？</h2>
+  <p class="section-sub">まず結論：ほぼ起きません。起きてもClaude Codeが解決してくれます。</p>
+  <div class="compare"><table>
+    <tr><th>ケース</th><th>結果</th><th>対応</th></tr>
+    <tr><td>別のファイルを変更</td><td style="background:#E8F5E9;">問題なし ✅</td><td>自動で合体</td></tr>
+    <tr><td>同じファイルの別の行を変更</td><td style="background:#E8F5E9;">問題なし ✅</td><td>自動で合体</td></tr>
+    <tr><td>同じファイルの同じ行を変更</td><td style="background:#FFEBEE;">衝突 ⚠️</td><td>どちらを残すか選択</td></tr>
+  </table></div>
+  <div class="note"><h4>現実的にどれくらい起きる？</h4><p><strong>ほぼ起きません。</strong>同じファイルの同じ行を同時に触ることは非常にまれです。万が一起きても、Claude Codeが「ここが衝突しています。どちらを残しますか？」と聞いてくれます。<strong>自分で解決する必要はありません。</strong></p></div>
+</section>
+<hr class="divider">
+
+<section id="desktop" class="section">
+  <div class="section-label">CHAPTER 08</div>
+  <h2>GitHub Desktopの使い方（確認用）</h2>
+  <p class="section-sub">GitHub Desktopは「確認ツール」として使います。コードの変更はClaude Codeがやります。</p>
+  <p style="font-size:14px; font-weight:700; margin-bottom:16px;">使うボタンは2つだけ：</p>
+  <div class="gh-buttons">
+    <div class="gh-btn"><div class="num">①</div><div class="name">Fetch origin</div><div class="desc">「誰かがPushしたかな？」を確認する。新しい変更があれば「Pull origin」に変わる。</div></div>
+    <div class="gh-btn"><div class="num">②</div><div class="name">Pull origin</div><div class="desc">Fetch後に表示される場合に押す。最新版をダウンロード。Claude Codeの「最新を取ってきて」と同じ。</div></div>
+  </div>
+  <div class="highlight"><h4>「Commit to main」「Push origin」は？</h4><p>Claude Codeがやるので、GitHub Desktopからは基本的に使いません。GitHub Desktopは「確認する」ためのツールとして使ってください。</p></div>
+</section>
+<hr class="divider">
+
+<section id="summary" class="section">
+  <div class="section-label">CHAPTER 09</div>
+  <h2>まとめ — 3つのルール</h2>
+  <div class="rule-cards">
+    <div class="rule-card blue"><div class="rule-num">1</div><div><h4>作業を始める前に</h4><p>「最新を取ってきて」とClaude Codeに言う</p></div></div>
+    <div class="rule-card green"><div class="rule-num">2</div><div><h4>反映したい時</h4><p>「ホームページ更新して」でPush（Claude Codeが自動でPull+Push）</p></div></div>
+    <div class="rule-card amber"><div class="rule-num">3</div><div><h4>困ったら</h4><p>Claude Codeに聞く。自分で解決しようとしなくてOK</p></div></div>
+  </div>
+  <p style="text-align:center; font-size:15px; font-weight:700; color:var(--dark); margin-top:24px;">以上！シンプルに守るだけで安全に運用できます。</p>
+  <p style="text-align:center; font-size:13px; color:var(--mid); margin-top:8px;">何かわからないことがあれば、いつでも福冨まで聞いてください！</p>
+</section>
+<hr class="divider">
+
+<section id="faq" class="section">
+  <div class="section-label">CHAPTER 10</div>
+  <h2>よくある疑問</h2>
+  <div class="accordion">
+    <div class="accordion-item"><button class="accordion-btn" onclick="toggle(this)">Pullを忘れてPushしちゃったらどうなる？ <span class="arrow">▼</span></button><div class="accordion-content"><p>Claude Codeが「ホームページ更新して」の時に<strong>自動でPullしてからPush</strong>するので、忘れても大丈夫です。</p></div></div>
+    <div class="accordion-item"><button class="accordion-btn" onclick="toggle(this)">「衝突しています」と言われたら？ <span class="arrow">▼</span></button><div class="accordion-content"><p>Claude Codeが「どちらを残しますか？」と聞いてくれます。指示してください。自分で解決する必要はありません。</p></div></div>
+    <div class="accordion-item"><button class="accordion-btn" onclick="toggle(this)">間違えてPushしちゃったら？ <span class="arrow">▼</span></button><div class="accordion-content"><p>「前の状態に戻して」とClaude Codeに言えば、いつでも元に戻せます。焦らなくて大丈夫です。</p></div></div>
+    <div class="accordion-item"><button class="accordion-btn" onclick="toggle(this)">福冨さんと同時に作業していいの？ <span class="arrow">▼</span></button><div class="accordion-content"><p><strong>大丈夫です。</strong>別のファイルや別の行なら自動で合体されます。同じ行を触った場合のみClaude Codeが聞いてくれます。</p></div></div>
+    <div class="accordion-item"><button class="accordion-btn" onclick="toggle(this)">GitHub Desktopは毎日開く必要がある？ <span class="arrow">▼</span></button><div class="accordion-content"><p>開かなくても問題ありません。確認したい時だけ「Fetch origin」を押してください。</p></div></div>
+  </div>
+</section>
+
+<footer>
+  <strong>ドリームプロジェクトジャパン株式会社</strong><br>
+  「自分らしく生きる人を増やして日本を元気にする」<br><br>
+  最終更新：2026年3月 ／ 社内利用限定
+</footer>
+
+<script>function toggle(btn){btn.classList.toggle('open');btn.nextElementSibling.classList.toggle('open');}</script>
+</body>
+</html>

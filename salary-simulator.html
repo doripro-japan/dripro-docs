@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>月額賃金改善義務額シミュレーター｜共同生活援助（介護サービス包括型）</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Helvetica Neue','Hiragino Kaku Gothic ProN','Meiryo',sans-serif; background: #f0f4fb; padding: 2rem 1rem; min-height: 100vh; }
+  .sim { max-width: 760px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.10); }
+  .sim-title { background: #1a3a6b; color: #fff; padding: 1.2rem 1.8rem; }
+  .sim-title .sub { font-size: 11px; color: #90b8e0; margin-bottom: 4px; }
+  .sim-title h1 { font-size: 18px; font-weight: 600; }
+  .section { background: #fff; border-top: 1px solid #d8e8f8; padding: 1.2rem 1.8rem; }
+  .section.tinted { background: #f7fafd; }
+  .section.amber { background: #fffdf0; border-top: 1px solid #e8d080; }
+  .section.last { border-radius: 0 0 12px 12px; }
+  .sec-label { font-size: 12px; font-weight: 700; color: #1a3a6b; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
+  .sec-label.amber { color: #8a5000; }
+  .era-btns { display: flex; gap: 0.6rem; }
+  .era-btn { flex: 1; padding: 0.65rem 1rem; border: 2px solid #c0d4ec; border-radius: 8px; background: #fff; font-size: 14px; font-weight: 600; color: #5a7898; cursor: pointer; text-align: center; transition: all 0.15s; }
+  .era-btn:hover { background: #eaf2fb; }
+  .era-btn .sub { font-size: 11px; font-weight: 400; color: #8aabb0; margin-top: 2px; }
+  .era-btn.sel-r6 { background: #e8f0fc; border-color: #1a3a6b; color: #1a3a6b; }
+  .era-btn.sel-r6 .sub { color: #5a80b0; }
+  .era-btn.sel-r8 { background: #fff5e0; border-color: #c47d00; color: #7a4800; }
+  .era-btn.sel-r8 .sub { color: #b08040; }
+  .kubun-grid { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.3rem; }
+  .k-btn { padding: 0.55rem 1.1rem; border: 2px solid #c0d4ec; border-radius: 8px; background: #fff; cursor: pointer; text-align: center; min-width: 90px; transition: all 0.15s; }
+  .k-btn:hover { background: #eaf2fb; }
+  .k-btn.sel { background: #1a3a6b; border-color: #1a3a6b; }
+  .k-name { font-size: 15px; font-weight: 700; color: #1a3040; }
+  .k-btn.sel .k-name { color: #fff; }
+  .k-rate { font-size: 12px; color: #7090b0; margin-top: 1px; }
+  .k-btn.sel .k-rate { color: #a0d0f0; }
+  .kubun-note { font-size: 11px; color: #8090a8; margin-top: 0.5rem; }
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .inp-field { display: flex; flex-direction: column; gap: 4px; }
+  .inp-field label { font-size: 13px; font-weight: 600; color: #2a4060; }
+  .inp-field .hint { font-size: 11px; color: #7090b0; }
+  .inp-field input { font-size: 18px; font-weight: 700; padding: 0.55rem 0.8rem; border: 2px solid #b0cce8; border-radius: 8px; background: #f7fafd; color: #0a2040; width: 100%; }
+  .inp-field input:focus { outline: none; border-color: #1a3a6b; background: #fff; }
+  .formula-box { background: #fff; border: 1.5px solid #b0cce8; border-radius: 10px; padding: 1rem 1.2rem; line-height: 2.2; }
+  .f-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.2rem; }
+  .f-chip { padding: 0.2rem 0.7rem; border-radius: 6px; font-size: 14px; font-weight: 700; }
+  .f-chip.blue { background: #e0ecfb; border: 1px solid #a0c0e0; color: #1a3a6b; }
+  .f-chip.orange { background: #fff0dc; border: 1px solid #d0a060; color: #7a4000; }
+  .f-chip.green { background: #e0f5ec; border: 1px solid #80c0a0; color: #1a6040; }
+  .f-op { font-size: 16px; font-weight: 700; color: #7090b0; }
+  .f-explain { font-size: 12px; color: #5878a0; line-height: 1.6; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #e0eaf8; }
+  .f-explain strong { color: #c47d00; }
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+  .r-card { background: #f0f5fc; border-radius: 8px; padding: 0.7rem 1rem; }
+  .r-lbl { font-size: 11px; color: #6080a8; margin-bottom: 2px; }
+  .r-val { font-size: 16px; font-weight: 700; color: #0a2040; }
+  .r-card.answer { grid-column: 1 / -1; background: #1e6648; display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.4rem; border-radius: 10px; }
+  .r-card.answer .r-lbl { color: #90e8c8; font-size: 13px; font-weight: 600; }
+  .r-card.answer .r-val { color: #fff; font-size: 28px; }
+  .answer-note { font-size: 11px; color: #88e0c0; text-align: right; line-height: 1.5; max-width: 200px; }
+  .ck-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 0.6rem; }
+  .ck-row:last-of-type { margin-bottom: 0; }
+  .ck-row input[type="checkbox"] { width: 17px; height: 17px; margin-top: 2px; flex-shrink: 0; accent-color: #c47d00; cursor: pointer; }
+  .ck-text { font-size: 14px; color: #3a2000; line-height: 1.4; cursor: pointer; }
+  .ck-sub { font-size: 11px; color: #8a6020; margin-top: 2px; display: block; }
+  .tokrei-msg { display: none; background: #fff3cd; border: 1.5px solid #d4a820; border-radius: 8px; padding: 0.7rem 1rem; font-size: 13px; color: #5a3800; line-height: 1.6; margin-top: 0.6rem; }
+  .tokrei-msg.show { display: block; }
+  .sim-footer { background: #1a3a6b; color: #7aaad0; font-size: 11px; padding: 0.7rem 1.8rem; line-height: 1.6; border-radius: 0 0 12px 12px; }
+  @media (max-width: 520px) { .input-grid { grid-template-columns: 1fr; } .result-grid { grid-template-columns: 1fr; } .era-btns { flex-direction: column; } .r-card.answer { flex-direction: column; gap: 0.5rem; } .answer-note { text-align: left; } }
+</style>
+</head>
+<body>
+
+<div class="sim">
+  <div class="sim-title">
+    <div class="sub">共同生活援助（介護サービス包括型）専用</div>
+    <h1>月額賃金改善義務額 シミュレーター</h1>
+  </div>
+
+  <!-- STEP1 時期 -->
+  <div class="section">
+    <div class="sec-label">STEP 1　制度の時期を選んでください</div>
+    <div class="era-btns">
+      <div class="era-btn sel-r6" id="btn-r6" onclick="setEra('r6')">令和4〜7年度<div class="sub">現行区分：Ⅰ / Ⅱ / Ⅲ / Ⅳ</div></div>
+      <div class="era-btn" id="btn-r8" onclick="setEra('r8')">令和8年6月〜<div class="sub">新区分：Ⅰイ / Ⅰロ / Ⅱイ / Ⅱロ / Ⅲ / Ⅳ</div></div>
+    </div>
+  </div>
+
+  <!-- STEP2 区分 -->
+  <div class="section tinted">
+    <div class="sec-label">STEP 2　取得している加算区分を選んでください</div>
+    <div class="kubun-grid" id="kubun-grid"></div>
+    <div class="kubun-note" id="kubun-note"></div>
+  </div>
+
+  <!-- STEP3 入力 -->
+  <div class="section">
+    <div class="sec-label">STEP 3　数字を入力してください</div>
+    <div class="input-grid">
+      <div class="inp-field">
+        <label>処遇改善加算の金額（1ヶ月分）― 円</label>
+        <div class="hint">支払決定通知書の処遇改善加算の金額</div>
+        <input type="number" id="inp-total" value="200000" min="0" step="1000" oninput="calc()">
+      </div>
+      <div class="inp-field">
+        <label>対象職員数（参考）― 人</label>
+        <div class="hint">1人あたり単価の参考値を算出します</div>
+        <input type="number" id="inp-staff" value="5" min="1" step="1" oninput="calc()">
+      </div>
+    </div>
+  </div>
+
+  <!-- 計算式 -->
+  <div class="section tinted">
+    <div class="sec-label">計算式の内訳（なぜこの金額になるのか）</div>
+    <div class="formula-box">
+      <div class="f-row">
+        <span class="f-chip blue" id="f-total">200,000円</span>
+        <span class="f-op">×</span>
+        <span class="f-chip orange" id="f-ratio">10.5 / 14.7（加算Ⅳ相当比率）</span>
+        <span class="f-op">=</span>
+        <span class="f-chip green" id="f-bear">142,857円（加算Ⅳ相当額）</span>
+      </div>
+      <div class="f-row">
+        <span class="f-chip green" id="f-bear2">142,857円</span>
+        <span class="f-op">×</span>
+        <span class="f-chip orange">1/2</span>
+        <span class="f-op">=</span>
+        <span class="f-chip green" id="f-duty-eq">71,428円（月額義務額）</span>
+      </div>
+      <div class="f-explain" id="f-explain"></div>
+    </div>
+  </div>
+
+  <!-- 結果 -->
+  <div class="section">
+    <div class="sec-label">計算結果</div>
+    <div class="result-grid">
+      <div class="r-card">
+        <div class="r-lbl">処遇改善加算の金額（月額）</div>
+        <div class="r-val" id="r-total">200,000 円</div>
+      </div>
+      <div class="r-card">
+        <div class="r-lbl">取得区分の加算率</div>
+        <div class="r-val" id="r-kubun-rate">—</div>
+      </div>
+      <div class="r-card">
+        <div class="r-lbl">加算Ⅳ相当比率（Ⅳ率 ÷ 自分の率）</div>
+        <div class="r-val" id="r-ratio">71.4 %</div>
+      </div>
+      <div class="r-card">
+        <div class="r-lbl">職員1人あたり参考単価</div>
+        <div class="r-val" id="r-per">14,286 円 / 人</div>
+      </div>
+      <div class="r-card answer">
+        <div>
+          <div class="r-lbl">毎月 基本給または毎月手当として払い出す最低額</div>
+          <div class="r-val" id="r-duty">71,428 円</div>
+        </div>
+        <div class="answer-note">この金額を下回ると<br>月額賃金改善要件Ⅰを<br>満たせません</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 令和8年度特例要件 -->
+  <div class="section amber last" id="tokrei-section" style="display:none;">
+    <div class="sec-label amber">令和8年度 特例要件（該当する場合にチェック）</div>
+    <div class="ck-row">
+      <input type="checkbox" id="ck-r8" onchange="calc()">
+      <label class="ck-text" for="ck-r8">加算Ⅰロ・Ⅱロを特例要件で算定する
+        <span class="ck-sub">ア）生産性向上の取組5つ以上（⑱⑳必須）またはイ）社会福祉連携推進法人所属、かつウ）加算Ⅱロ相当額の1/2以上を月給配分</span>
+      </label>
+    </div>
+    <div class="ck-row" id="ck-urow" style="opacity:0.4;pointer-events:none;">
+      <input type="checkbox" id="ck-u" onchange="calc()">
+      <label class="ck-text" for="ck-u">ウ要件を令和8年度中の誓約で対応する
+        <span class="ck-sub">未対応が確認された場合は加算の一部または全部を返還</span>
+      </label>
+    </div>
+    <div class="tokrei-msg" id="tokrei-msg"></div>
+  </div>
+
+  <div id="no-r8-footer">
+    <div class="sim-footer">
+      ※計算式は厚生労働省「別紙様式3-2（加算 個票）」セルS14に準拠。加算Ⅳ相当比率はサービス種別ごとに異なります（本ツールは共同生活援助・介護サービス包括型専用）。正式な計算は実績報告書様式および指定権者の指示に従ってください。
+    </div>
+  </div>
+</div>
+
+<script>
+// 共同生活援助（介護サービス包括型）の加算率
+const RATE_IV_R6 = 0.105;  // 加算Ⅳの率（令和4〜7年度）
+const RATE_IV_R8 = 0.121;  // 加算Ⅳの率（令和8年6月〜）
+
+const KUBUN = {
+  r6: [
+    { label: '新加算Ⅰ', rate: 0.147 },
+    { label: '新加算Ⅱ', rate: 0.144 },
+    { label: '新加算Ⅲ', rate: 0.128 },
+    { label: '新加算Ⅳ', rate: 0.105 },
+  ],
+  r8: [
+    { label: 'Ⅰイ', rate: 0.163 },
+    { label: 'Ⅰロ', rate: 0.169 },
+    { label: 'Ⅱイ', rate: 0.160 },
+    { label: 'Ⅱロ', rate: 0.166 },
+    { label: 'Ⅲ',   rate: 0.144 },
+    { label: 'Ⅳ',   rate: 0.121 },
+  ]
+};
+
+let era = 'r6';
+let selIdx = 0;
+
+function setEra(e) {
+  era = e; selIdx = 0;
+  document.getElementById('btn-r6').className = 'era-btn' + (e === 'r6' ? ' sel-r6' : '');
+  document.getElementById('btn-r8').className = 'era-btn' + (e === 'r8' ? ' sel-r8' : '');
+  document.getElementById('tokrei-section').style.display = e === 'r8' ? '' : 'none';
+  renderKubun(); calc();
+}
+
+function renderKubun() {
+  const grid = document.getElementById('kubun-grid');
+  grid.innerHTML = '';
+  KUBUN[era].forEach((k, i) => {
+    const d = document.createElement('div');
+    d.className = 'k-btn' + (i === selIdx ? ' sel' : '');
+    d.innerHTML = `<div class="k-name">${k.label}</div><div class="k-rate">${(k.rate * 100).toFixed(1)}%</div>`;
+    d.onclick = () => { selIdx = i; renderKubun(); calc(); };
+    grid.appendChild(d);
+  });
+  document.getElementById('kubun-note').textContent = era === 'r6'
+    ? '※令和4〜7年度の加算率（令和6年度実績報告書より）'
+    : '※令和8年6月施行の加算率（厚労省第53回報酬改定検討チーム資料より）';
+}
+
+function fmt(n) { return Math.floor(n).toLocaleString('ja-JP') + ' 円'; }
+
+function calc() {
+  const total = parseInt(document.getElementById('inp-total').value) || 0;
+  const staff = Math.max(1, parseInt(document.getElementById('inp-staff').value) || 1);
+  const k = KUBUN[era][selIdx];
+  const rateIV = era === 'r6' ? RATE_IV_R6 : RATE_IV_R8;
+
+  // 厚労省公式：加算Ⅳ相当比率 = Ⅳの率 ÷ 自分の加算率
+  const ratio = rateIV / k.rate;
+  // 加算Ⅳ相当額
+  const bearAmount = Math.floor(total * ratio);
+  // 月額義務額 = 加算Ⅳ相当額 × 1/2（切り捨て）
+  const duty = Math.floor(bearAmount * 0.5);
+  const perP = Math.floor(duty / staff);
+
+  const rateIVpct = (rateIV * 100).toFixed(1);
+  const myRatePct = (k.rate * 100).toFixed(1);
+  const ratioPct = (ratio * 100).toFixed(1);
+
+  // 計算式表示
+  document.getElementById('f-total').textContent = total.toLocaleString('ja-JP') + '円';
+  document.getElementById('f-ratio').textContent = `${rateIVpct} / ${myRatePct}（加算Ⅳ相当比率 = ${ratioPct}%）`;
+  document.getElementById('f-bear').textContent = fmt(bearAmount) + '（加算Ⅳ相当額）';
+  document.getElementById('f-bear2').textContent = fmt(bearAmount);
+  document.getElementById('f-duty-eq').textContent = fmt(duty) + '（月額義務額）';
+  document.getElementById('f-explain').innerHTML =
+    `▶ 厚労省「別紙様式3-2」S14セルの公式計算式に準拠しています。<br>` +
+    `▶ 加算Ⅳ相当比率 = <strong>加算Ⅳの率（${rateIVpct}%）÷ 取得区分の率（${myRatePct}%）= ${ratioPct}%</strong><br>` +
+    `▶ 処遇改善加算の金額 × 加算Ⅳ相当比率 × 1/2 = <strong>月額賃金改善義務額</strong>（月額賃金改善要件Ⅰ）<br>` +
+    `▶ この金額以上を、毎月の<strong>基本給</strong>または<strong>決まって毎月支払われる手当</strong>として支給する必要があります。`;
+
+  // 結果表示
+  document.getElementById('r-total').textContent = total.toLocaleString('ja-JP') + ' 円';
+  document.getElementById('r-kubun-rate').textContent = `${k.label}：${myRatePct} %`;
+  document.getElementById('r-ratio').textContent = `${ratioPct} %（${rateIVpct} ÷ ${myRatePct}）`;
+  document.getElementById('r-per').textContent = perP.toLocaleString('ja-JP') + ' 円 / 人';
+  document.getElementById('r-duty').textContent = fmt(duty);
+
+  // 特例要件
+  const ckR8 = document.getElementById('ck-r8');
+  const ckU = document.getElementById('ck-u');
+  const urow = document.getElementById('ck-urow');
+  const msg = document.getElementById('tokrei-msg');
+  if (era === 'r8' && ckR8 && ckR8.checked) {
+    urow.style.opacity = '1'; urow.style.pointerEvents = 'auto';
+    msg.className = 'tokrei-msg show';
+    msg.textContent = ckU.checked
+      ? '令和8年度特例要件を適用中（ウ要件は誓約猶予）。令和8年度内に取組を実施し、実績報告書で確認されます。'
+      : '令和8年度特例要件（ア・イのいずれか＋ウ）を全て満たして算定。加算Ⅰロ・Ⅱロの上位区分を取得できます。';
+  } else {
+    if (ckR8) { urow.style.opacity = '0.4'; urow.style.pointerEvents = 'none'; }
+    if (msg) msg.className = 'tokrei-msg';
+  }
+}
+
+renderKubun();
+calc();
+</script>
+</body>
+</html>

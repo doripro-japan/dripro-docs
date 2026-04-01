@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>処遇改善緊急支援事業 シミュレーター｜共同生活援助（介護サービス包括型）</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Helvetica Neue','Hiragino Kaku Gothic ProN','Meiryo',sans-serif; background: #f0f4fb; padding: 1.5rem 1rem; min-height: 100vh; }
+  .sim { max-width: 800px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.10); }
+  .sim-title { background: #1a3a6b; color: #fff; padding: 1.2rem 1.8rem; }
+  .sim-title .sub { font-size: 11px; color: #90b8e0; margin-bottom: 4px; }
+  .sim-title h1 { font-size: 18px; font-weight: 600; }
+  .section { background: #fff; border-top: 1px solid #d8e8f8; padding: 1.2rem 1.8rem; }
+  .section.tinted { background: #f7fafd; }
+  .section.green-bg { background: #f0faf4; border-top: 1px solid #a0d8b0; }
+  .section.amber-bg { background: #fffdf0; border-top: 1px solid #e8d080; }
+  .sec-label { font-size: 12px; font-weight: 700; color: #1a3a6b; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
+  .sec-label.green { color: #1a6040; }
+  .sec-label.amber { color: #8a5000; }
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .input-grid.col3 { grid-template-columns: 1fr 1fr 1fr; }
+  .inp-field { display: flex; flex-direction: column; gap: 4px; }
+  .inp-field.full { grid-column: 1 / -1; }
+  .inp-field label { font-size: 13px; font-weight: 600; color: #2a4060; }
+  .inp-field .hint { font-size: 11px; color: #7090b0; }
+  .inp-field input, .inp-field select { font-size: 16px; font-weight: 700; padding: 0.5rem 0.7rem; border: 2px solid #b0cce8; border-radius: 8px; background: #f7fafd; color: #0a2040; width: 100%; }
+  .inp-field input:focus, .inp-field select:focus { outline: none; border-color: #1a3a6b; background: #fff; }
+  .inp-field input.active-override { border-color: #2e7d32; background: #f0faf4; }
+  .kubun-row { display: flex; gap: 0.6rem; align-items: center; margin-bottom: 0.5rem; }
+  .kubun-row .kl { font-size: 13px; font-weight: 600; color: #2a4060; min-width: 70px; }
+  .kubun-row input { width: 70px; font-size: 15px; font-weight: 700; padding: 0.4rem 0.5rem; border: 2px solid #b0cce8; border-radius: 6px; text-align: center; }
+  .kubun-row .kp { font-size: 12px; color: #7090b0; margin-left: 4px; }
+  .kubun-row .kv { font-size: 12px; color: #5878a0; min-width: 100px; text-align: right; }
+  .or-divider { display: flex; align-items: center; gap: 12px; margin: 12px 0; }
+  .or-divider .line { flex: 1; height: 1px; background: #d8e8f8; }
+  .or-divider .or-text { font-size: 11px; font-weight: 700; color: #7090b0; background: #fff; padding: 2px 12px; border-radius: 10px; border: 1px solid #d8e8f8; }
+  .override-note { font-size: 11px; color: #2e7d32; font-weight: 600; margin-top: 4px; display: none; }
+  .override-note.show { display: block; }
+  .r-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.6rem; }
+  .r-card { background: #f0f5fc; border-radius: 8px; padding: 0.7rem 1rem; }
+  .r-card .rl { font-size: 11px; color: #6080a8; margin-bottom: 2px; }
+  .r-card .rv { font-size: 16px; font-weight: 700; color: #0a2040; }
+  .r-card.big { grid-column: 1 / -1; background: #1e6648; display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.4rem; border-radius: 10px; }
+  .r-card.big .rl { color: #90e8c8; font-size: 13px; font-weight: 600; }
+  .r-card.big .rv { color: #fff; font-size: 26px; }
+  .r-card.warn { background: #fff3e0; border: 1.5px solid #ffb74d; }
+  .r-card.warn .rl { color: #e65100; }
+  .r-card.warn .rv { color: #bf360c; }
+  .r-card.ok { background: #e8f5e9; border: 1.5px solid #81c784; }
+  .r-card.ok .rl { color: #2e7d32; }
+  .r-card.ok .rv { color: #1b5e20; }
+  .rate-table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 12px; }
+  .rate-table th { background: #1a3a6b; color: #fff; padding: 6px 8px; text-align: center; font-weight: 600; }
+  .rate-table td { padding: 5px 8px; border: 1px solid #d8e8f8; text-align: center; }
+  .rate-table .era-label { background: #f0f5fc; font-weight: 700; color: #1a3a6b; }
+  .rate-table .diff-row { background: #e0f7fa; font-weight: 700; color: #00695c; }
+  .rate-table .r8-row { background: #fff8e1; }
+  .monthly-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 12px; }
+  .monthly-table th { background: #1a3a6b; color: #fff; padding: 6px 10px; text-align: left; font-weight: 600; }
+  .monthly-table td { padding: 5px 10px; border-bottom: 1px solid #e0eaf8; }
+  .monthly-table tr:nth-child(even) td { background: #f7fafd; }
+  .monthly-table .total-row td { background: #e8f0fc; font-weight: 700; border-top: 2px solid #1a3a6b; }
+  .formula-box { background: #fff; border: 1.5px solid #b0cce8; border-radius: 10px; padding: 0.8rem 1rem; margin-top: 0.5rem; font-size: 13px; color: #3a5070; line-height: 1.8; }
+  .formula-box strong { color: #1a3a6b; }
+  .sim-footer { background: #1a3a6b; color: #7aaad0; font-size: 11px; padding: 0.7rem 1.8rem; line-height: 1.6; border-radius: 0 0 12px 12px; }
+  .divider { border: none; border-top: 1px solid #d8e8f8; margin: 0; }
+  @media (max-width: 520px) { .input-grid, .input-grid.col3, .r-grid { grid-template-columns: 1fr; } .r-card.big { flex-direction: column; gap: 0.5rem; } }
+</style>
+</head>
+<body>
+<div class="sim">
+  <div class="sim-title">
+    <div class="sub">共同生活援助（介護サービス包括型）専用</div>
+    <h1>処遇改善緊急支援事業 シミュレーター</h1>
+  </div>
+
+  <!-- STEP1: 訓練等給付費 -->
+  <div class="section">
+    <div class="sec-label">STEP 1　訓練等給付費の総額を入力してください</div>
+    <p style="font-size:12px; color:#5878a0; margin-bottom:10px;">方法A（直接入力）か方法B（区分から計算）のどちらかでOKです。方法Aが入力されている場合はそちらを優先します。</p>
+
+    <div class="inp-field" style="margin-bottom:8px;">
+      <label>方法A：支払決定通知書の訓練等給付費の総額（月額）</label>
+      <div class="hint">直近の支払決定通知書の額をそのまま入力。こちらが入力されていれば方法Bより優先されます。</div>
+      <input type="number" id="directTotal" value="" min="0" step="1000" placeholder="例：610,000" oninput="calc()">
+    </div>
+    <div class="override-note" id="override-note">✅ 支払決定通知書の額を使用中（方法Aが優先）</div>
+
+    <div class="or-divider"><div class="line"></div><div class="or-text">または</div><div class="line"></div></div>
+
+    <p style="font-size:12px; font-weight:600; color:#2a4060; margin-bottom:8px;">方法B：区分別人数から概算</p>
+    <div class="kubun-row"><span class="kl">区分6</span><input type="number" id="k6" value="0" min="0" oninput="calc()"><span class="kp">人</span><span class="kv">× 400,000円</span></div>
+    <div class="kubun-row"><span class="kl">区分5</span><input type="number" id="k5" value="0" min="0" oninput="calc()"><span class="kp">人</span><span class="kv">× 350,000円</span></div>
+    <div class="kubun-row"><span class="kl">区分4</span><input type="number" id="k4" value="1" min="0" oninput="calc()"><span class="kp">人</span><span class="kv">× 150,000円</span></div>
+    <div class="kubun-row"><span class="kl">区分3</span><input type="number" id="k3" value="2" min="0" oninput="calc()"><span class="kp">人</span><span class="kv">× 130,000円</span></div>
+    <div class="kubun-row"><span class="kl">区分2</span><input type="number" id="k2" value="2" min="0" oninput="calc()"><span class="kp">人</span><span class="kv">× 100,000円</span></div>
+    <div class="kubun-row"><span class="kl">区分1以下</span><input type="number" id="k1" value="0" min="0" oninput="calc()"><span class="kp">人</span><span class="kv">× 150,000円</span></div>
+    <div style="margin-top:6px; font-size:11px; color:#7090b0;">※金額は区分別の概算基本報酬単価です。計画表に入れた金額でもOK</div>
+  </div>
+
+  <!-- STEP2: 職員情報 -->
+  <div class="section tinted">
+    <div class="sec-label">STEP 2　職員・夜勤の条件を入力してください</div>
+    <div class="input-grid">
+      <div class="inp-field">
+        <label>管理者への上乗せ額（月額合計）</label>
+        <div class="hint">管理者・サビ管等への処遇改善上乗せ合計</div>
+        <input type="number" id="mgr" value="10000" min="0" step="1000" oninput="calc()">
+      </div>
+      <div class="inp-field">
+        <label>常勤換算数（世話人）</label>
+        <input type="number" id="cw" value="2.4" min="0" step="0.1" oninput="calc()">
+      </div>
+      <div class="inp-field">
+        <label>常勤換算数（生活支援員）</label>
+        <input type="number" id="cls" value="0.6" min="0" step="0.1" oninput="calc()">
+      </div>
+      <div class="inp-field">
+        <label>常勤換算数（予備・加配）</label>
+        <input type="number" id="cex" value="0.2" min="0" step="0.1" oninput="calc()">
+      </div>
+      <div class="inp-field">
+        <label>時給上乗せ額（世話人等）</label>
+        <div class="hint">円/時間</div>
+        <input type="number" id="hr" value="20" min="0" step="5" oninput="calc()">
+      </div>
+      <div class="inp-field">
+        <label>月間勤務時間（1人あたり）</label>
+        <div class="hint">h/月</div>
+        <input type="number" id="mh" value="168" min="0" step="1" oninput="calc()">
+      </div>
+    </div>
+    <div style="margin-top:12px;"></div>
+    <div class="sec-label">夜勤条件</div>
+    <div class="input-grid col3">
+      <div class="inp-field"><label>夜間休憩時間（h）</label><input type="number" id="nrest" value="2" min="0" step="0.5" oninput="calc()"></div>
+      <div class="inp-field"><label>住居数（棟）</label><input type="number" id="nhouse" value="1" min="0" step="1" oninput="calc()"></div>
+      <div class="inp-field"><label>開所日数（日/月）</label><input type="number" id="ndays" value="20" min="0" step="1" oninput="calc()"></div>
+    </div>
+  </div>
+
+  <!-- STEP3: 加算率 -->
+  <div class="section">
+    <div class="sec-label">STEP 3　処遇改善加算の区分を選んでください</div>
+
+    <table class="rate-table">
+      <tr><th></th><th colspan="2">(Ⅰ)</th><th colspan="2">(Ⅱ)</th><th>(Ⅲ)</th><th>(Ⅳ)</th></tr>
+      <tr class="era-label"><td>今まで</td><td colspan="2">14.7%</td><td colspan="2">14.4%</td><td>12.8%</td><td>10.5%</td></tr>
+      <tr class="diff-row"><td>増加%</td><td>1.6</td><td>2.2</td><td>1.6</td><td>2.2</td><td>1.6</td><td>1.6</td></tr>
+      <tr class="r8-row"><td>R8年度<br>6月から</td><td>(Ⅰ)イ<br><b>16.3</b></td><td>(Ⅰ)ロ<br><b>16.9</b></td><td>(Ⅱ)イ<br><b>16.0</b></td><td>(Ⅱ)ロ<br><b>16.6</b></td><td>(Ⅲ)<br><b>14.4</b></td><td>(Ⅳ)<br><b>12.1</b></td></tr>
+    </table>
+
+    <div class="input-grid" style="margin-top:12px;">
+      <div class="inp-field">
+        <label>現在の加算区分</label>
+        <select id="rateOld" onchange="calc()">
+          <option value="14.7">(Ⅰ) — 14.7%</option>
+          <option value="14.4" selected>(Ⅱ) — 14.4%</option>
+          <option value="12.8">(Ⅲ) — 12.8%</option>
+          <option value="10.5">(Ⅳ) — 10.5%</option>
+        </select>
+      </div>
+      <div class="inp-field">
+        <label>変更後の加算区分（R8年度6月〜）</label>
+        <select id="rateNew" onchange="calc()">
+          <option value="16.3">(Ⅰ)イ — 16.3%</option>
+          <option value="16.9">(Ⅰ)ロ — 16.9%</option>
+          <option value="16.0">(Ⅱ)イ — 16.0%</option>
+          <option value="16.6" selected>(Ⅱ)ロ — 16.6%</option>
+          <option value="14.4">(Ⅲ) — 14.4%</option>
+          <option value="12.1">(Ⅳ) — 12.1%</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 計算結果：収入 -->
+  <div class="section green-bg">
+    <div class="sec-label green">計算結果：収入（入ってくるお金）</div>
+    <div class="r-grid">
+      <div class="r-card"><div class="rl">訓練等給付費の総額（月）</div><div class="rv" id="o-total">-</div></div>
+      <div class="r-card"><div class="rl">処遇改善加算抜きの報酬（月）</div><div class="rv" id="o-base">-</div></div>
+      <div class="r-card"><div class="rl">補助金額（報酬 × 14.1%）</div><div class="rv" id="o-subsidy">-</div></div>
+      <div class="r-card"><div class="rl">処遇改善加算の上昇分（年）</div><div class="rv" id="o-kaizen-year">-</div></div>
+      <div class="r-card big">
+        <div><div class="rl">収入合計（補助金＋加算上昇分）</div><div class="rv" id="o-income">-</div></div>
+        <div style="font-size:11px; color:#88e0c0; text-align:right;">年間で入ってくる追加収入</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 計算結果：支出 -->
+  <div class="section amber-bg">
+    <div class="sec-label amber">計算結果：支出（増える人件費）</div>
+    <div class="r-grid">
+      <div class="r-card"><div class="rl">管理者等への上乗せ（月）</div><div class="rv" id="o-mgr">-</div></div>
+      <div class="r-card"><div class="rl">世話人等の時給上乗せ（月）</div><div class="rv" id="o-staff">-</div></div>
+      <div class="r-card"><div class="rl">夜勤者の増加人件費（月）</div><div class="rv" id="o-night">-</div></div>
+      <div class="r-card"><div class="rl">人件費 増加合計（月）</div><div class="rv" id="o-cost-month">-</div></div>
+      <div class="r-card" style="grid-column:1/-1;"><div class="rl">人件費 増加合計（年）</div><div class="rv" id="o-cost-year">-</div></div>
+    </div>
+  </div>
+
+  <!-- 差額判定 -->
+  <div class="section">
+    <div class="sec-label">差額判定：足りる？足りない？</div>
+    <div class="r-grid">
+      <div class="r-card" id="diff-card"><div class="rl" id="diff-label">-</div><div class="rv" id="diff-val">-</div></div>
+      <div class="r-card"><div class="rl">余りは賞与で配分可能</div><div class="rv" style="font-size:12px; color:#5878a0;">収入 − 支出 がプラスなら余った分を賞与で配れます</div></div>
+    </div>
+  </div>
+
+  <!-- 月別内訳 -->
+  <div class="section tinted">
+    <div class="sec-label">月別内訳（12ヶ月）</div>
+    <table class="monthly-table">
+      <tr><th>月</th><th>増加人件費（月）</th></tr>
+      <tr><td>04月（05月給与支払い）</td><td id="m04">-</td></tr>
+      <tr><td>05月（06月給与支払い）</td><td id="m05">-</td></tr>
+      <tr><td>06月（07月給与支払い）</td><td id="m06">-</td></tr>
+      <tr><td>07月（08月給与支払い）</td><td id="m07">-</td></tr>
+      <tr><td>08月（09月給与支払い）</td><td id="m08">-</td></tr>
+      <tr><td>09月（10月給与支払い）</td><td id="m09">-</td></tr>
+      <tr><td>10月（11月給与支払い）</td><td id="m10">-</td></tr>
+      <tr><td>11月（12月給与支払い）</td><td id="m11">-</td></tr>
+      <tr><td>12月（01月給与支払い）</td><td id="m12">-</td></tr>
+      <tr><td>01月（02月給与支払い）</td><td id="m01">-</td></tr>
+      <tr><td>02月（03月給与支払い）</td><td id="m02">-</td></tr>
+      <tr><td>03月（04月給与支払い）</td><td id="m03">-</td></tr>
+      <tr class="total-row"><td>年間合計</td><td id="m-total">-</td></tr>
+    </table>
+  </div>
+
+  <!-- 計算式の説明 -->
+  <div class="section">
+    <div class="sec-label">計算式の説明</div>
+    <div class="formula-box">
+      <strong>■ 訓練等給付費の総額</strong> = 支払決定通知書の額（方法A）、または区分別単価×人数の合計（方法B）<br>
+      <strong>■ 処遇改善加算抜き</strong> = 総額 ÷（1 + 現在の加算率）<br>
+      <strong>■ 補助金額</strong> = 処遇改善加算抜き × 14.1%<br>
+      <strong>■ 加算上昇分（月）</strong> = 処遇改善加算抜き ×（変更後率 − 現在率）<br>
+      <strong>■ 世話人等の時給上乗せ</strong> = 時給上乗せ × 常勤換算合計 × 月間時間<br>
+      <strong>■ 夜勤増加人件費</strong> = 時給×1.25（深夜割増）×（7h − 休憩）× 住居数 × 開所日数<br>
+      <strong>■ 差額</strong> =（補助金 + 加算上昇分×12）−（増加人件費×12）
+    </div>
+  </div>
+
+  <div class="sim-footer">
+    ※本シミュレーターはドリプロ参考資料です。正式な計算は実績報告書様式および指定権者の指示に従ってください。補助金の14.1%は処遇改善緊急支援事業の概算値です。
+  </div>
+</div>
+
+<script>
+const U = [400000, 350000, 150000, 130000, 100000, 150000];
+function v(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function fmt(n) { return Math.floor(n).toLocaleString('ja-JP') + ' 円'; }
+
+function calc() {
+  // 方法A（直接入力）が優先
+  const directInput = document.getElementById('directTotal').value.trim();
+  const directVal = parseFloat(directInput) || 0;
+  const k = [v('k6'), v('k5'), v('k4'), v('k3'), v('k2'), v('k1')];
+  const calcTotal = k.reduce((s, n, i) => s + n * U[i], 0);
+
+  const useDirect = directVal > 0;
+  const total = useDirect ? directVal : calcTotal;
+
+  // 優先表示
+  const note = document.getElementById('override-note');
+  const directEl = document.getElementById('directTotal');
+  if (useDirect) {
+    note.className = 'override-note show';
+    directEl.className = 'active-override';
+  } else {
+    note.className = 'override-note';
+    directEl.className = '';
+  }
+
+  const rateOld = parseFloat(document.getElementById('rateOld').value) / 100;
+  const rateNew = parseFloat(document.getElementById('rateNew').value) / 100;
+  const base = total / (1 + rateOld);
+  const subsidy = base * 0.141;
+  const rateDiff = rateNew - rateOld;
+  const kaizenMonth = base * rateDiff;
+  const kaizenYear = kaizenMonth * 12;
+  const income = subsidy + kaizenYear;
+
+  const mgr = v('mgr');
+  const cw = v('cw'), cls = v('cls'), cex = v('cex');
+  const hr = v('hr'), mh = v('mh');
+  const staffCost = hr * cw * mh + hr * cls * mh + hr * cex * mh;
+  const nrest = v('nrest'), nhouse = v('nhouse'), ndays = v('ndays');
+  const nightRate = hr * 1.25;
+  const nightCost = nightRate * (7 - nrest) * nhouse * ndays;
+  const costMonth = mgr + staffCost + nightCost;
+  const costYear = costMonth * 12;
+  const diff = income - costYear;
+
+  document.getElementById('o-total').textContent = fmt(total) + (useDirect ? '（通知書）' : '（概算）');
+  document.getElementById('o-base').textContent = fmt(base);
+  document.getElementById('o-subsidy').textContent = fmt(subsidy);
+  document.getElementById('o-kaizen-year').textContent = fmt(kaizenYear);
+  document.getElementById('o-income').textContent = fmt(income);
+  document.getElementById('o-mgr').textContent = fmt(mgr);
+  document.getElementById('o-staff').textContent = fmt(staffCost);
+  document.getElementById('o-night').textContent = fmt(nightCost);
+  document.getElementById('o-cost-month').textContent = fmt(costMonth);
+  document.getElementById('o-cost-year').textContent = fmt(costYear);
+
+  const dc = document.getElementById('diff-card');
+  const dl = document.getElementById('diff-label');
+  const dv = document.getElementById('diff-val');
+  if (diff >= 0) { dc.className = 'r-card ok'; dl.textContent = '余剰（賞与で配分可能）'; dv.textContent = '+ ' + fmt(diff); }
+  else { dc.className = 'r-card warn'; dl.textContent = '不足（追加財源が必要）'; dv.textContent = fmt(diff); }
+
+  ['m04','m05','m06','m07','m08','m09','m10','m11','m12','m01','m02','m03'].forEach(id => document.getElementById(id).textContent = fmt(costMonth));
+  document.getElementById('m-total').textContent = fmt(costYear);
+}
+calc();
+</script>
+</body>
+</html>

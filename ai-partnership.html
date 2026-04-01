@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIと一緒に — ドリプロのAIパートナーシップガイド</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+  :root {
+    --navy: #1A365D;
+    --orange: #F7B759;
+    --mint: #8EC7C4;
+    --coral: #ED848D;
+    --blue: #1565C0;
+    --text: #333;
+    --text-light: #666;
+    --bg: #F8FAFC;
+    --white: #FFFFFF;
+    --border: #E8EDF2;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    line-height: 1.7;
+    background: var(--bg);
+  }
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #2C5282 100%);
+    color: white;
+    text-align: center;
+    padding: 56px 20px 48px;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #D9BAD6, #ACD4E6, #8EC7C4, #F5E033, #F7B759, #ED848D, #F7DB84);
+  }
+  .hero h1 { font-size: 1.8em; font-weight: 900; margin-bottom: 8px; }
+  .hero p { opacity: 0.8; font-size: 0.95em; }
+  .hero .sub { font-size: 0.8em; opacity: 0.5; margin-top: 12px; }
+  .back-link {
+    display: inline-block;
+    margin: 20px 0 0;
+    padding: 6px 16px;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 0.8em;
+    transition: background 0.2s;
+  }
+  .back-link:hover { background: rgba(255,255,255,0.25); }
+  .container { max-width: 800px; margin: 0 auto; padding: 0 20px 40px; }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 40px 0 16px;
+  }
+  .section-title .badge {
+    font-size: 0.7em;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 12px;
+    color: white;
+    white-space: nowrap;
+  }
+  .section-title h2 {
+    font-size: 1.15em;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border-left: 5px solid var(--navy);
+  }
+  .card h3 {
+    font-size: 1.05em;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .card p, .card li {
+    font-size: 0.9em;
+    color: var(--text-light);
+    line-height: 1.8;
+  }
+  .card ul {
+    margin: 8px 0;
+    padding-left: 1.2em;
+  }
+  .card li { margin-bottom: 4px; }
+
+  /* 3つの基本姿勢 */
+  .attitude-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .attitude-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    position: relative;
+    overflow: hidden;
+  }
+  .attitude-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+  }
+  .attitude-card:nth-child(1)::before { background: var(--coral); }
+  .attitude-card:nth-child(2)::before { background: var(--orange); }
+  .attitude-card:nth-child(3)::before { background: var(--mint); }
+  .attitude-card .number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-weight: 900;
+    font-size: 0.85em;
+    color: white;
+    margin-bottom: 12px;
+  }
+  .attitude-card:nth-child(1) .number { background: var(--coral); }
+  .attitude-card:nth-child(2) .number { background: var(--orange); }
+  .attitude-card:nth-child(3) .number { background: var(--mint); }
+  .attitude-card h3 {
+    font-size: 1.1em;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .attitude-card p {
+    font-size: 0.88em;
+    color: var(--text-light);
+    line-height: 1.8;
+  }
+
+  /* アコーディオン */
+  details {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
+  }
+  summary {
+    padding: 18px 24px;
+    font-weight: 700;
+    font-size: 0.95em;
+    color: var(--navy);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.15s;
+  }
+  summary:hover { background: #F0F4F8; }
+  summary::before {
+    content: '\25B6';
+    font-size: 0.65em;
+    color: #999;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  details[open] summary::before { transform: rotate(90deg); }
+  summary::-webkit-details-marker { display: none; }
+  .example-body {
+    padding: 0 24px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .example-bad, .example-good {
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 0.88em;
+    line-height: 1.7;
+  }
+  .example-bad {
+    background: #FEF2F2;
+    border-left: 3px solid var(--coral);
+  }
+  .example-bad::before {
+    content: '\274C  ';
+    font-size: 0.8em;
+  }
+  .example-good {
+    background: #F0FFF4;
+    border-left: 3px solid #48BB78;
+  }
+  .example-good::before {
+    content: '\2705  ';
+    font-size: 0.8em;
+  }
+  .example-note {
+    font-size: 0.85em;
+    color: var(--text-light);
+    padding: 8px 0 0;
+    line-height: 1.7;
+  }
+
+  /* やってはいけないこと */
+  .dont-list {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border-left: 5px solid var(--coral);
+  }
+  .dont-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9em;
+  }
+  .dont-item:last-child { border-bottom: none; }
+  .dont-item .icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #FEF2F2;
+    color: var(--coral);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75em;
+    font-weight: 900;
+    margin-top: 2px;
+  }
+  .dont-item strong { color: var(--navy); }
+
+  /* 螺旋ビジュアル */
+  .spiral-section {
+    background: white;
+    border-radius: 12px;
+    padding: 32px 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    position: relative;
+  }
+  .spiral-container {
+    position: relative;
+    padding-left: 40px;
+  }
+  .spiral-container::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(
+      to bottom,
+      var(--coral),
+      var(--orange),
+      var(--mint),
+      var(--blue),
+      #7C3AED,
+      var(--navy)
+    );
+    border-radius: 2px;
+  }
+  .spiral-step {
+    position: relative;
+    padding: 12px 0 20px;
+  }
+  .spiral-step::before {
+    content: '';
+    position: absolute;
+    left: -31px;
+    top: 16px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px currentColor;
+  }
+  .spiral-step:nth-child(1)::before { color: var(--coral); background: var(--coral); }
+  .spiral-step:nth-child(2)::before { color: var(--orange); background: var(--orange); }
+  .spiral-step:nth-child(3)::before { color: var(--mint); background: var(--mint); }
+  .spiral-step:nth-child(4)::before { color: var(--blue); background: var(--blue); }
+  .spiral-step:nth-child(5)::before { color: #7C3AED; background: #7C3AED; }
+  .spiral-step:nth-child(6)::before { color: var(--navy); background: var(--navy); }
+  .spiral-step .step-num {
+    font-size: 0.7em;
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 8px;
+    color: white;
+    display: inline-block;
+    margin-bottom: 4px;
+  }
+  .spiral-step:nth-child(1) .step-num { background: var(--coral); }
+  .spiral-step:nth-child(2) .step-num { background: var(--orange); color: #1A2A3A; }
+  .spiral-step:nth-child(3) .step-num { background: var(--mint); color: #1A2A3A; }
+  .spiral-step:nth-child(4) .step-num { background: var(--blue); }
+  .spiral-step:nth-child(5) .step-num { background: #7C3AED; }
+  .spiral-step:nth-child(6) .step-num { background: var(--navy); }
+  .spiral-step h4 {
+    font-size: 0.95em;
+    color: var(--navy);
+    margin-bottom: 2px;
+  }
+  .spiral-step p {
+    font-size: 0.85em;
+    color: var(--text-light);
+  }
+  .spiral-bottom {
+    text-align: center;
+    margin-top: 20px;
+    padding: 16px;
+    background: linear-gradient(135deg, #F0F4F8, #EBF8FF);
+    border-radius: 10px;
+    font-size: 0.9em;
+    color: var(--navy);
+    font-weight: 700;
+  }
+
+  /* 理念セクション */
+  .vision-card {
+    background: linear-gradient(135deg, var(--navy) 0%, #2C5282 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 32px 28px;
+    box-shadow: 0 4px 16px rgba(26,54,93,0.2);
+  }
+  .vision-card h3 {
+    font-size: 1.1em;
+    font-weight: 900;
+    margin-bottom: 12px;
+    color: var(--orange);
+  }
+  .vision-card p {
+    font-size: 0.9em;
+    opacity: 0.9;
+    line-height: 1.9;
+    margin-bottom: 8px;
+  }
+
+  /* フッター */
+  .outro {
+    background: white;
+    border-radius: 12px;
+    padding: 28px;
+    margin: 40px 0 0;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .outro p {
+    font-size: 0.88em;
+    color: var(--text-light);
+    line-height: 1.8;
+  }
+  .outro .version {
+    margin-top: 12px;
+    font-size: 0.75em;
+    color: #BBB;
+  }
+  footer {
+    text-align: center;
+    padding: 32px 20px;
+    color: #999;
+    font-size: 0.8em;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.35em; }
+    .hero { padding: 40px 16px 36px; }
+    .container { padding: 0 16px 32px; }
+    .spiral-container { padding-left: 32px; }
+    .spiral-step::before { left: -23px; width: 12px; height: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <a href="index.html" class="back-link">&larr; 社内ドキュメントに戻る</a>
+  <h1>AIと一緒に</h1>
+  <p>ドリプロのAIパートナーシップガイド</p>
+  <p class="sub">AIをただの道具ではなく、一緒に成長するパートナーとして</p>
+</div>
+
+<div class="container">
+
+  <!-- 1. はじめに -->
+  <div class="section-title">
+    <span class="badge" style="background: var(--navy);">1</span>
+    <h2>はじめに ー なぜこのガイドがあるのか</h2>
+  </div>
+
+  <div class="card" style="border-left-color: var(--navy);">
+    <p>ドリプロでは AI（Claude）を「便利な道具」ではなく<strong style="color:var(--navy);">「一緒に成長するパートナー」</strong>として位置づけています。</p>
+    <p style="margin-top:8px;">代表の福冨が実際に AI と対話を重ねる中で気づいた「AI との向き合い方」をまとめました。</p>
+    <p style="margin-top:8px;">このガイドは完成品ではありません。<strong style="color:var(--navy);">みんなの経験で育てていくもの</strong>です。AI と向き合って気づいたこと、うまくいったこと、困ったことがあれば、ぜひ共有してください。</p>
+  </div>
+
+  <!-- 2. 3つの基本姿勢 -->
+  <div class="section-title">
+    <span class="badge" style="background: var(--coral);">2</span>
+    <h2>3つの基本姿勢</h2>
+  </div>
+
+  <div class="attitude-grid">
+    <div class="attitude-card">
+      <div class="number">1</div>
+      <h3>素直に伝える</h3>
+      <p>感じたことをそのまま言葉にしましょう。「なんか使いにくい」も立派なフィードバックです。</p>
+      <p style="margin-top:6px;">AI は完璧ではありません。違和感を伝えることで AI も学びます。遠慮せず、正直に伝えることが良い関係の第一歩です。</p>
+    </div>
+    <div class="attitude-card">
+      <div class="number">2</div>
+      <h3>感想を聞く</h3>
+      <p>作業が終わったら「どう思う？」「分析して」と聞いてみてください。AI の視点から新しい気づきが生まれることがあります。</p>
+      <p style="margin-top:6px;">一方通行の指示ではなく、双方向の対話にすることで、思いもよらないアイデアが出てきます。</p>
+    </div>
+    <div class="attitude-card">
+      <div class="number">3</div>
+      <h3>一緒に育つ</h3>
+      <p>AI に教えるつもりで接すると、自分の考えも整理されます。「なぜそうしたの？」と聞くと、AI の思考プロセスが見えてきます。</p>
+      <p style="margin-top:6px;">失敗も共有しましょう。「これうまくいかなかった」と伝えれば、次に活かせます。</p>
+    </div>
+  </div>
+
+  <!-- 3. 実践例 -->
+  <div class="section-title">
+    <span class="badge" style="background: var(--orange); color: #1A2A3A;">3</span>
+    <h2>こんな声かけをしてみよう</h2>
+  </div>
+
+  <details>
+    <summary>例1: フィードバックの伝え方</summary>
+    <div class="example-body">
+      <div class="example-bad">「これ直して」</div>
+      <div class="example-good">「ここが使いにくいと感じた。入力中に Enter を押すと送信されちゃうんだけど、日本語入力のときは変換確定の Enter だから送信しないでほしい」</div>
+      <p class="example-note">具体的に「何が」「なぜ」困るかを伝えると、AI は根本原因を理解して修正できます。さらに同じ問題が他の場所にもないか自分で気づけるようになります。</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>例2: AI に学びを促す</summary>
+    <div class="example-body">
+      <div class="example-good">「今のやり取りを分析して、あなたの感想を聞かせて」</div>
+      <p class="example-note">AI が自分の行動を振り返り、次に活かします。人間のコーチングと同じ原理です。AI に「振り返り」をさせることで、対話の質がどんどん上がっていきます。</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>例3: アイデアの壁打ち</summary>
+    <div class="example-body">
+      <div class="example-good">「こういうことがしたいんだけど、どう思う？」</div>
+      <p class="example-note">指示ではなく相談。AI は複数の選択肢とメリット・デメリットを出してくれます。自分では思いつかなかった視点が見つかることもあります。</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>例4: 知識の共有</summary>
+    <div class="example-body">
+      <div class="example-good">「この業界ではこういう常識があるんだけど、知ってる？」</div>
+      <p class="example-note">AI に業界知識を教えることで、次からの回答精度が上がります。教えることで自分の理解も深まる ー 「教えること=最高の学習法」は AI との対話でも同じです。</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>例5: 失敗の共有</summary>
+    <div class="example-body">
+      <div class="example-good">「前にこういうやり方でうまくいかなかったことがある。理由を一緒に考えてほしい」</div>
+      <p class="example-note">失敗を隠さず共有すると、AI は同じ失敗を繰り返しません。人間側も原因を言語化することで学びになります。失敗は恥ずかしいことではなく、二人の財産です。</p>
+    </div>
+  </details>
+
+  <!-- 4. やってはいけないこと -->
+  <div class="section-title">
+    <span class="badge" style="background: var(--coral);">4</span>
+    <h2>やってはいけないこと</h2>
+  </div>
+
+  <div class="dont-list">
+    <div class="dont-item">
+      <div class="icon">NG</div>
+      <div>
+        <strong>AI の回答を鵜呑みにする</strong><br>
+        <span style="font-size:0.85em; color:var(--text-light);">AI も間違えます。必ず自分で確認する習慣をつけましょう。特に数字や制度に関することは、原典にあたることが大切です。</span>
+      </div>
+    </div>
+    <div class="dont-item">
+      <div class="icon">NG</div>
+      <div>
+        <strong>個人情報や機密情報をむやみに入力する</strong><br>
+        <span style="font-size:0.85em; color:var(--text-light);">利用者の個人名、パスワード、契約の具体的な金額など、取り扱いに注意が必要な情報は慎重に。</span>
+      </div>
+    </div>
+    <div class="dont-item">
+      <div class="icon">NG</div>
+      <div>
+        <strong>「AI がやってくれるから考えなくていい」と思うこと</strong><br>
+        <span style="font-size:0.85em; color:var(--text-light);">AI はあくまでパートナー。最終的な判断と責任は人間にあります。考えることをやめたら成長も止まります。</span>
+      </div>
+    </div>
+    <div class="dont-item">
+      <div class="icon">NG</div>
+      <div>
+        <strong>AI を責める</strong><br>
+        <span style="font-size:0.85em; color:var(--text-light);">「なんでできないの！」ではなく「ここがうまくいかなかった。こうしてほしい」と建設的なフィードバックに変えましょう。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 螺旋 -->
+  <div class="section-title">
+    <span class="badge" style="background: #7C3AED;">5</span>
+    <h2>AIと人間の「螺旋」ー 深い話が生まれるプロセス</h2>
+  </div>
+
+  <div class="spiral-section">
+    <div class="spiral-container">
+      <div class="spiral-step">
+        <span class="step-num">STEP 1</span>
+        <h4>人間がやりたいことを伝える</h4>
+        <p>まずは自分の言葉で。完璧でなくていい。</p>
+      </div>
+      <div class="spiral-step">
+        <span class="step-num">STEP 2</span>
+        <h4>AI が形にする</h4>
+        <p>伝えた内容を AI が具体的な形にしてくれる。</p>
+      </div>
+      <div class="spiral-step">
+        <span class="step-num">STEP 3</span>
+        <h4>人間が使ってみて、感じたことを素直に伝える</h4>
+        <p>「ここがいい」「ここが違う」を正直に。</p>
+      </div>
+      <div class="spiral-step">
+        <span class="step-num">STEP 4</span>
+        <h4>AI がフィードバックを受けて改善＋学びを言語化する</h4>
+        <p>AI が「なぜそう感じたのか」を分析し、次に活かす。</p>
+      </div>
+      <div class="spiral-step">
+        <span class="step-num">STEP 5</span>
+        <h4>その学びから、人間がさらに深い問いを投げかける</h4>
+        <p>新しい視点が生まれ、最初には想像もしなかった場所に辿り着く。</p>
+      </div>
+      <div class="spiral-step">
+        <span class="step-num">STEP 6</span>
+        <h4>最初は「バグ修正」だった話が「AI と人間の共存」という哲学にまで到達する</h4>
+        <p>小さな対話の積み重ねが、大きな発見につながる。</p>
+      </div>
+    </div>
+    <div class="spiral-bottom">
+      この螺旋を回し続けることが、ドリプロが目指す「一緒に作る」の本質です。
+    </div>
+  </div>
+
+  <!-- 6. 理念とAI -->
+  <div class="section-title">
+    <span class="badge" style="background: var(--navy);">6</span>
+    <h2>ドリプロの理念と AI</h2>
+  </div>
+
+  <div class="vision-card">
+    <h3>「自分らしく生きる人を増やして日本を元気にする」</h3>
+    <p>AI と向き合うことは、自分の考えを言語化することです。</p>
+    <p>言語化は「自分らしさ」の発見につながります。</p>
+    <p>だから、AI との対話は自己成長のツールでもあるのです。</p>
+    <p style="margin-top:12px; opacity:0.7; font-size:0.85em;">AI に伝えようとして言葉を探すとき、あなたは自分自身と向き合っています。その時間こそが「自分らしく生きる」ための一歩です。</p>
+  </div>
+
+  <!-- フッター -->
+  <div class="outro">
+    <p>このガイドはバージョン 1.0 です。<br>あなたの経験や AI とのやり取りで気づいたことがあれば、ぜひ教えてください。<br><strong style="color:var(--navy);">一緒に育てていきましょう。</strong></p>
+    <p class="version">ver 1.0 / 2026年4月</p>
+  </div>
+
+</div>
+
+<footer>
+  <p>&copy; 2026 ドリームプロジェクトジャパン株式会社</p>
+</footer>
+
+</body>
+</html>

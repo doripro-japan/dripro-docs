@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第4期 全社集会 | ドリプロ</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+  :root {
+    --navy: #1A365D;
+    --purple: #6B46C1;
+    --orange: #F7B759;
+    --mint: #8EC7C4;
+    --coral: #ED848D;
+    --teal: #2B6CB0;
+    --brown: #B7791F;
+    --red: #C53030;
+    --text: #333;
+    --text-light: #666;
+    --bg: #F8FAFC;
+    --white: #FFFFFF;
+    --border: #E8EDF2;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Noto Sans JP', sans-serif; color: var(--text); line-height: 1.8; background: var(--bg); }
+
+  /* ヒーロー */
+  .hero {
+    background: linear-gradient(135deg, #1A202C 0%, #2D3748 50%, #4A5568 100%);
+    color: white; text-align: center; padding: 56px 20px 48px; position: relative;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, #D9BAD6, #ACD4E6, #8EC7C4, #F5E033, #F7B759, #ED848D, #F7DB84);
+  }
+  .hero .date { font-size: 0.85em; opacity: 0.6; margin-bottom: 4px; }
+  .hero h1 { font-size: 2.2em; font-weight: 900; margin-bottom: 8px; }
+  .hero .subtitle { font-size: 1.1em; opacity: 0.8; }
+  .hero .vision {
+    display: inline-block; margin-top: 16px; padding: 8px 24px;
+    border: 2px solid rgba(255,255,255,0.3); border-radius: 8px;
+    font-size: 0.95em; font-weight: 700; letter-spacing: 0.05em;
+  }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+  .back-link { display: inline-block; margin: 20px 0 0; font-size: 0.85em; color: var(--teal); text-decoration: none; }
+  .back-link:hover { text-decoration: underline; }
+
+  /* セクションヘッダー */
+  .section-header {
+    margin: 40px 0 20px; padding-bottom: 10px;
+    border-bottom: 3px solid var(--navy);
+  }
+  .section-header .num {
+    display: inline-block; background: var(--navy); color: white;
+    font-size: 0.7em; font-weight: 700; padding: 2px 12px; border-radius: 12px;
+    margin-bottom: 6px;
+  }
+  .section-header h2 { font-size: 1.4em; font-weight: 900; color: var(--navy); }
+  .section-header p { font-size: 0.9em; color: var(--text-light); margin-top: 4px; }
+
+  /* KPIカード */
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 20px 0; }
+  .kpi {
+    background: white; border-radius: 12px; padding: 20px; text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .kpi .label { font-size: 0.8em; color: var(--text-light); margin-bottom: 4px; }
+  .kpi .value { font-size: 1.8em; font-weight: 900; color: var(--navy); }
+  .kpi .sub { font-size: 0.75em; color: #999; margin-top: 2px; }
+
+  /* 行動指針カード */
+  .guidelines { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 20px 0; }
+  .guide-card {
+    background: white; border-radius: 12px; padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid var(--navy);
+    transition: transform 0.15s;
+  }
+  .guide-card:hover { transform: translateY(-2px); }
+  .guide-card .number { font-size: 0.75em; font-weight: 700; color: white; background: var(--navy); display: inline-block; padding: 1px 10px; border-radius: 10px; margin-bottom: 8px; }
+  .guide-card h3 { font-size: 1.1em; font-weight: 900; margin-bottom: 8px; color: var(--navy); }
+  .guide-card p { font-size: 0.85em; color: var(--text-light); margin-bottom: 10px; }
+  .guide-card ul { list-style: none; padding: 0; }
+  .guide-card ul li { font-size: 0.82em; padding: 4px 0; padding-left: 18px; position: relative; color: var(--text); }
+  .guide-card ul li::before { content: ''; position: absolute; left: 0; top: 11px; width: 8px; height: 8px; border-radius: 50%; }
+
+  .guide-card.c1 { border-top-color: #6B46C1; }
+  .guide-card.c1 .number { background: #6B46C1; }
+  .guide-card.c1 ul li::before { background: #D6BCFA; }
+
+  .guide-card.c2 { border-top-color: #2B6CB0; }
+  .guide-card.c2 .number { background: #2B6CB0; }
+  .guide-card.c2 ul li::before { background: #BEE3F8; }
+
+  .guide-card.c3 { border-top-color: #2F855A; }
+  .guide-card.c3 .number { background: #2F855A; }
+  .guide-card.c3 ul li::before { background: #C6F6D5; }
+
+  .guide-card.c4 { border-top-color: #B7791F; }
+  .guide-card.c4 .number { background: #B7791F; }
+  .guide-card.c4 ul li::before { background: #FEFCBF; }
+
+  .guide-card.c5 { border-top-color: #C53030; }
+  .guide-card.c5 .number { background: #C53030; }
+  .guide-card.c5 ul li::before { background: #FED7D7; }
+
+  .guide-card.c6 { border-top-color: #6B46C1; }
+  .guide-card.c6 .number { background: #6B46C1; }
+  .guide-card.c6 ul li::before { background: #E9D8FD; }
+
+  .guide-card.c7 { border-top-color: #D69E2E; }
+  .guide-card.c7 .number { background: #D69E2E; }
+  .guide-card.c7 ul li::before { background: #FEFCBF; }
+
+  .guide-card.c8 { border-top-color: #3182CE; }
+  .guide-card.c8 .number { background: #3182CE; }
+  .guide-card.c8 ul li::before { background: #BEE3F8; }
+
+  /* 他責vs自責 */
+  .compare-box {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0;
+  }
+  .compare-card {
+    background: white; border-radius: 12px; padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .compare-card.bad { border-left: 5px solid #E53E3E; }
+  .compare-card.good { border-left: 5px solid #38A169; }
+  .compare-card .tag {
+    display: inline-block; font-size: 0.7em; font-weight: 700; padding: 2px 10px;
+    border-radius: 10px; margin-bottom: 8px;
+  }
+  .compare-card.bad .tag { background: #FFF5F5; color: #C53030; }
+  .compare-card.good .tag { background: #F0FFF4; color: #276749; }
+  .compare-card h4 { font-size: 1em; font-weight: 700; margin-bottom: 8px; }
+  .compare-card ul { list-style: none; padding: 0; }
+  .compare-card ul li { font-size: 0.85em; padding: 3px 0; color: var(--text-light); }
+
+  /* 4期ロードマップ */
+  .roadmap { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 20px 0; }
+  .roadmap-card {
+    background: white; border-radius: 12px; padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04); text-align: center;
+  }
+  .roadmap-card .timing { font-size: 0.7em; font-weight: 700; color: white; display: inline-block; padding: 2px 12px; border-radius: 10px; margin-bottom: 8px; }
+  .roadmap-card h4 { font-size: 1.05em; font-weight: 900; margin-bottom: 6px; }
+  .roadmap-card p { font-size: 0.8em; color: var(--text-light); }
+  .roadmap-card .essence { font-size: 0.75em; font-weight: 700; margin-top: 10px; padding: 4px 12px; border-radius: 8px; display: inline-block; }
+
+  /* ビジョン */
+  .vision-box {
+    background: linear-gradient(135deg, #1A202C, #2D3748);
+    color: white; border-radius: 16px; padding: 40px 32px; margin: 24px 0; text-align: center;
+  }
+  .vision-box .label { font-size: 0.8em; opacity: 0.6; margin-bottom: 8px; }
+  .vision-box h3 { font-size: 1.6em; font-weight: 900; margin-bottom: 16px; }
+  .vision-box .pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+  .vision-box .pillar {
+    background: rgba(255,255,255,0.1); border-radius: 12px; padding: 16px;
+  }
+  .vision-box .pillar h4 { font-size: 0.95em; font-weight: 700; margin-bottom: 4px; }
+  .vision-box .pillar p { font-size: 0.78em; opacity: 0.8; }
+
+  /* 土台カード */
+  .foundation { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 20px 0; }
+  .found-card {
+    background: white; border-radius: 12px; padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .found-card h4 { font-size: 0.95em; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .found-card p { font-size: 0.8em; color: var(--text-light); }
+
+  /* まとめ3カード */
+  .closing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0; }
+  .closing-card {
+    background: white; border-radius: 12px; padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04); text-align: center;
+  }
+  .closing-card .num { font-size: 2em; font-weight: 900; color: var(--navy); }
+  .closing-card h4 { font-size: 1.1em; font-weight: 700; margin: 8px 0; }
+  .closing-card p { font-size: 0.82em; color: var(--text-light); }
+  .closing-card .bottom { font-size: 0.8em; font-weight: 700; color: var(--orange); margin-top: 12px; }
+
+  /* 議事録 */
+  .minutes-section {
+    background: white; border-radius: 16px; padding: 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin: 24px 0;
+  }
+  .minutes-section h3 { font-size: 1.2em; font-weight: 900; color: var(--navy); margin-bottom: 16px; border-bottom: 2px solid var(--border); padding-bottom: 8px; }
+  .minutes-section h4 { font-size: 1em; font-weight: 700; color: var(--navy); margin: 16px 0 8px; }
+  .minutes-section ul { padding-left: 20px; margin-bottom: 12px; }
+  .minutes-section li { font-size: 0.88em; margin-bottom: 4px; color: var(--text); }
+  .minutes-section .meta-info { font-size: 0.85em; color: var(--text-light); margin-bottom: 16px; }
+  .minutes-section .meta-info span { margin-right: 16px; }
+
+  /* アコーディオン */
+  details { margin: 12px 0; }
+  details summary {
+    cursor: pointer; font-weight: 700; font-size: 0.95em; color: var(--navy);
+    padding: 12px 16px; background: #EBF4FF; border-radius: 8px;
+    list-style: none; display: flex; align-items: center; gap: 8px;
+  }
+  details summary::before { content: ''; display: inline-block; width: 0; height: 0; border-left: 6px solid var(--navy); border-top: 4px solid transparent; border-bottom: 4px solid transparent; transition: transform 0.2s; }
+  details[open] summary::before { transform: rotate(90deg); }
+  details .content { padding: 16px; font-size: 0.88em; line-height: 1.8; }
+
+  footer { text-align: center; padding: 32px 20px; color: #999; font-size: 0.8em; border-top: 1px solid var(--border); margin-top: 40px; }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.5em; }
+    .guidelines { grid-template-columns: 1fr; }
+    .compare-box { grid-template-columns: 1fr; }
+    .roadmap { grid-template-columns: 1fr 1fr; }
+    .closing { grid-template-columns: 1fr; }
+    .vision-box .pillars { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <p class="date">2026年4月1日</p>
+  <h1>第4期 全社集会</h1>
+  <p class="subtitle">DREAM PROJECT JAPAN</p>
+  <div class="vision">自分らしく生きる人を増やして日本を元気にする</div>
+</div>
+
+<div class="container">
+  <a href="index.html" class="back-link">← ドキュメント一覧に戻る</a>
+
+  <!-- ===== 3期の振り返り ===== -->
+  <div class="section-header">
+    <span class="num">01</span>
+    <h2>3期を振り返って ― 1年間、ありがとうございました。</h2>
+    <p>新しい取り組み、組織の形、仕組みづくり。ようやくスタートラインに立てた感覚があります</p>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="label">1年前（3期スタート）</div>
+      <div class="value">7名</div>
+      <div class="sub">男性のみ・業務委託中心</div>
+    </div>
+    <div class="kpi">
+      <div class="label">現在（4期スタート）</div>
+      <div class="value" style="color: #38A169;">約30名</div>
+      <div class="sub">正社員・パート・3拠点体制</div>
+    </div>
+    <div class="kpi">
+      <div class="label">コンサル事業</div>
+      <div class="value">400社</div>
+      <div class="sub">全国の事業所と関わり</div>
+    </div>
+    <div class="kpi">
+      <div class="label">3期のテーマ</div>
+      <div class="value" style="font-size: 1.2em;">足元を固めた</div>
+      <div class="sub">売上より整えることに集中</div>
+    </div>
+  </div>
+
+  <!-- ===== 理念・使命 ===== -->
+  <div class="section-header">
+    <span class="num">02</span>
+    <h2>理念・使命</h2>
+    <p>利用者さんだけじゃない。職員一人ひとりが自分らしく働けること。それ自体が理念の実践です。</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0;">
+    <div style="background: linear-gradient(135deg, #2D3748, #4A5568); color: white; border-radius: 12px; padding: 28px;">
+      <div style="font-size: 0.75em; opacity: 0.6; margin-bottom: 4px;">VISION ― 理念</div>
+      <div style="font-size: 1.4em; font-weight: 900; line-height: 1.4;">自分らしく生きる人を増やして<br><span style="color: #F7B759;">日本を元気にする</span></div>
+    </div>
+    <div style="background: white; border-radius: 12px; padding: 28px; border-left: 4px solid var(--mint); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+      <div style="font-size: 0.75em; color: var(--mint); font-weight: 700; margin-bottom: 4px;">MISSION ― 使命</div>
+      <div style="font-size: 1.2em; font-weight: 900; color: var(--navy); margin-bottom: 8px;">夢を描いて実現するサポートをする</div>
+      <p style="font-size: 0.85em; color: var(--text-light);">自分たちがまず夢を描いて実現する。やり方がわからないとサポートはできない。</p>
+    </div>
+  </div>
+
+  <div style="background: white; border-radius: 12px; padding: 24px; margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-left: 4px solid var(--purple);">
+    <div style="font-size: 0.85em; font-weight: 700; color: var(--purple); margin-bottom: 4px;">リーディングカンパニーとして</div>
+    <div style="font-size: 1.15em; font-weight: 900; color: var(--navy);">福祉業界のイメージと常識を変えていく</div>
+    <p style="font-size: 0.85em; color: var(--text-light); margin-top: 4px;">福祉業界のパイオニアとして、新しい価値と可能性を示し続けます</p>
+  </div>
+
+  <!-- ===== 行動指針8つ ===== -->
+  <div class="section-header">
+    <span class="num">03</span>
+    <h2>行動指針 8つ ― 自分らしく動く羅針盤</h2>
+    <p>理念・使命を実現するための8つの行動指針です</p>
+  </div>
+
+  <div class="guidelines">
+    <div class="guide-card c1">
+      <span class="number">01</span>
+      <h3>対話を大切にし、腹を割って話す</h3>
+      <p>チームワークは信頼関係で成り立っています。遠慮や忖度ではなく、本音を伝え合う文化。</p>
+      <ul>
+        <li>「対立」ではなく「対話」で向き合う</li>
+        <li>感情ではなく事実や目的に基づいて話す</li>
+        <li>「反対意見」も遠慮なく伝える</li>
+        <li>違和感を感じたら正直に共有する</li>
+        <li>相手の話を遮らず、まず「聴く」姿勢を持つ</li>
+      </ul>
+    </div>
+
+    <div class="guide-card c2">
+      <span class="number">02</span>
+      <h3>オンとオフを切り替える</h3>
+      <p>気を抜くと仕事が生活に入り込んできます。メリハリをつけることで効率を上げていきます。</p>
+      <ul>
+        <li>業務中はタスク管理や集中タイムで生産性を高める</li>
+        <li>ゴール設定をしてそれに向けて計画を立てる</li>
+        <li>業務の効率化を常に意識する</li>
+        <li>就業後は仕事の連絡を控える</li>
+        <li>休日は仕事のことを忘れて心身を休める</li>
+      </ul>
+    </div>
+
+    <div class="guide-card c3">
+      <span class="number">03</span>
+      <h3>全てを自責で行動する</h3>
+      <p>誰かのせい、出来事のせいにする文化では成長しません。自分の行動や選択に責任を持つ。</p>
+      <ul>
+        <li>自責 = 自分を責めることではなく、コントロールできる部分に目を向ける</li>
+        <li>他責は成長の機会を失い、改善点に気付けなくなる</li>
+        <li>反省と振り返りで同じ失敗を繰り返さない</li>
+        <li>チームの信頼関係を守るため責任転嫁をしない</li>
+        <li>「誰かがやってくれるはず」ではなく自分から行動する</li>
+      </ul>
+    </div>
+
+    <div class="guide-card c4">
+      <span class="number">04</span>
+      <h3>限界を作らず成長し続ける</h3>
+      <p>「自分にはできない」と決めつけることで成長の機会を逃してしまいます。</p>
+      <ul>
+        <li>やったことない業務でもチャレンジしてみる</li>
+        <li>不明点がある時は「調べてみる」「教えてください」</li>
+        <li>最初から完璧を目指さず「まずやってみる・その後修正する」</li>
+        <li>挑戦と学びを続け、夢を実現していく</li>
+      </ul>
+    </div>
+
+    <div class="guide-card c5">
+      <span class="number">05</span>
+      <h3>一歩立ち止まる</h3>
+      <p>勢いがある会社ですし、業務も多い会社でもあります。「忙しいから」という時こそ、一歩立ち止まります。</p>
+      <ul>
+        <li>他人の意見に流されそうなとき「自分は本当はどう思っている？」と立ち返る</li>
+        <li>不安を抱えたまま動かず「何が不安なのか？」を言語化する</li>
+        <li>「モヤモヤする」と感じたとき、すぐに判断せず分析・相談する</li>
+        <li>決定前に「反対の視点」「リスク」「他の選択肢」を多面的に検討する</li>
+        <li>「この方向性で大丈夫か？目的に沿っているか？」と確認する</li>
+      </ul>
+    </div>
+
+    <div class="guide-card c6">
+      <span class="number">06</span>
+      <h3>わくわくの感覚を大事にする</h3>
+      <p>わくわくがある職場はチャレンジに前向きです。やらされ感がなく、創造的な提案が出やすくなります。</p>
+      <ul>
+        <li>仕事 =「こなすもの」から「創り出すもの」へ</li>
+        <li>チーム全体が挑戦や変化を「楽しめる組織」に</li>
+        <li>自分の好き・得意を業務に活かせる場面を探す</li>
+        <li>やってみたいと思った業務に挑戦する</li>
+        <li>新しい制度や技術、試みに関心を持ってリサーチする</li>
+      </ul>
+    </div>
+
+    <div class="guide-card c7">
+      <span class="number">07</span>
+      <h3>違和感を無視しない</h3>
+      <p>違和感は「改善のヒント」でもあり「危険信号」でもあります。声に出すことで早めに対処できます。</p>
+      <ul>
+        <li>業務や話し合いでモヤモヤしたら「少し気になることがある」と伝える</li>
+        <li>「空気を読んで黙っておこう」ではなく、しっかりと伝えていく</li>
+        <li>言葉にできないから言わないのではなく「違和感を感じている」と伝える</li>
+        <li>違和感を感じるのには理由がある。言語化できるよう練習する</li>
+        <li>言語化できると、自分らしいコミュニケーションができるようになる</li>
+      </ul>
+    </div>
+
+    <div class="guide-card c8">
+      <span class="number">08</span>
+      <h3>目的思考で行動する</h3>
+      <p>「何のためにやるのか？」が明確でないまま行動するとムダや遠回りになります。</p>
+      <ul>
+        <li>ゴールから逆算して、計画を立てる</li>
+        <li>「とりあえずやる」ではなく、目的に向かってやる</li>
+        <li>目的を明確にすることで「やらなくても良いこと」がわかる</li>
+        <li>例）営業に行くことが目的ではなく、利用者を獲得することが目的</li>
+        <li>例）利用者と仲良くなることが目的ではなく、支援することが目的</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== 人の違い ===== -->
+  <div class="section-header">
+    <span class="num">04</span>
+    <h2>人によって違いがあるのは、当たり前。</h2>
+    <p>自分らしさの根っこを知ろう</p>
+  </div>
+
+  <div style="background: white; border-radius: 12px; padding: 24px; margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; text-align: center; margin-bottom: 16px;">
+      <div style="background: #FFF5F5; padding: 12px 20px; border-radius: 10px;">
+        <div style="font-size: 0.7em; color: #C53030; font-weight: 700;">気質</div>
+        <div style="font-size: 0.85em; font-weight: 700;">生まれ持った傾向<br>感じ方・反応パターン</div>
+      </div>
+      <div style="font-size: 1.5em; color: #999;">+</div>
+      <div style="background: #EBF8FF; padding: 12px 20px; border-radius: 10px;">
+        <div style="font-size: 0.7em; color: #2B6CB0; font-weight: 700;">環境・経験</div>
+        <div style="font-size: 0.85em; font-weight: 700;">育ち・仕事・人間関係<br>価値観・判断基準</div>
+      </div>
+      <div style="font-size: 1.5em; color: #999;">=</div>
+      <div style="background: #FEFCBF; padding: 12px 20px; border-radius: 10px; border: 2px solid #D69E2E;">
+        <div style="font-size: 0.7em; color: #975A16; font-weight: 700;">その人らしさ</div>
+        <div style="font-size: 0.85em; font-weight: 700;">幸せの感じ方も<br>全員違って当たり前</div>
+      </div>
+      <div style="font-size: 1.5em; color: #999;">→</div>
+      <div style="background: #F0FFF4; padding: 12px 20px; border-radius: 10px;">
+        <div style="font-size: 0.7em; color: #276749; font-weight: 700;">活かし方</div>
+        <div style="font-size: 0.85em; font-weight: 700;">職員同士・利用者支援<br>両方に活きる</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 主体性 ===== -->
+  <div class="section-header">
+    <span class="num">05</span>
+    <h2>こんなこと、思ったことありませんか？</h2>
+    <p>不満を感じていい。でも、そこで止まるか動くかで全然違う。</p>
+  </div>
+
+  <div class="compare-box">
+    <div class="compare-card bad">
+      <span class="tag">他責パターン</span>
+      <h4>「会社が・上が・誰かが なんとかしてくれないと ...」</h4>
+      <p style="font-size: 0.85em; color: var(--text-light); margin: 8px 0;">↓ 不満のまま止まる</p>
+      <ul>
+        <li>・状況は何も変わらず不満だけが積み重なっていく</li>
+        <li>・成長の機会を失い、チームの信頼関係も崩れやすい</li>
+        <li>・「なぜ自分だけ」という思考のループにはまりやすい</li>
+      </ul>
+    </div>
+    <div class="compare-card good">
+      <span class="tag">自責パターン</span>
+      <h4>「なぜこうなってるんだろう？ 自分に何ができることは？」</h4>
+      <p style="font-size: 0.85em; color: var(--text-light); margin: 8px 0;">↓ 一歩踏み出す</p>
+      <ul>
+        <li>・「こうしてみたらどうかな」と声に出す</li>
+        <li>・それがチームを・会社を変えていく力になる</li>
+        <li>・それが「自分らしく働く」の一歩</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="background: #FEFCE8; border-radius: 12px; padding: 16px 24px; text-align: center; font-weight: 700; color: #92400E; font-size: 0.95em;">
+    自責 = 自分を責めることではない。自分がコントロールできる部分に目を向けること。
+  </div>
+
+  <!-- ===== 3期の土台 ===== -->
+  <div class="section-header">
+    <span class="num">06</span>
+    <h2>ドリプロが3期までに整えてきた土台</h2>
+  </div>
+
+  <div class="foundation">
+    <div class="found-card" style="border-left: 4px solid #E9D8FD;">
+      <h4>社食・食事補助</h4>
+      <p>職場での食事を会社がサポート。体と心を整える環境をつくってきました。</p>
+    </div>
+    <div class="found-card" style="border-left: 4px solid #BEE3F8;">
+      <h4>社員割引制度</h4>
+      <p>様々なサービスをお得に利用可能。自分らしい生活を支える仕組みです。</p>
+    </div>
+    <div class="found-card" style="border-left: 4px solid #C6F6D5;">
+      <h4>定時退社・残業ゼロ文化</h4>
+      <p>オンオフの切り替えを大切に。就業後の時間は自分の時間です。</p>
+    </div>
+    <div class="found-card" style="border-left: 4px solid #FEFCBF;">
+      <h4>夏季休暇</h4>
+      <p>まとまった休みをしっかり取れる。心身のリセットを会社が保証しています。</p>
+    </div>
+    <div class="found-card" style="border-left: 4px solid #FED7D7;">
+      <h4>時短正社員制度</h4>
+      <p>育児・介護・病気でも正社員のまま。ライフステージに合わせた働き方。</p>
+    </div>
+    <div class="found-card" style="border-left: 4px solid #F7B759;">
+      <h4>職員の意見を拾い上げる</h4>
+      <p>みんなの声を経営に反映。これはみなさんと一緒に作ってきたものです。</p>
+    </div>
+  </div>
+
+  <!-- ===== 4期でやること ===== -->
+  <div class="section-header">
+    <span class="num">07</span>
+    <h2>4期でやること、4期から始まること</h2>
+  </div>
+
+  <div class="roadmap">
+    <div class="roadmap-card" style="border-top: 4px solid #6B46C1;">
+      <span class="timing" style="background: #6B46C1;">4月スタート</span>
+      <h4>共同生活援助<br>グループホーム つむぎ</h4>
+      <p>利用者さんが自分らしく暮らせる場所。ドリプロの理念を形にした現場。チーム全員で育てる事業所</p>
+      <span class="essence" style="background: #F3E8FF; color: #553C9A;">理念の実践の場</span>
+    </div>
+    <div class="roadmap-card" style="border-top: 4px solid #ED8936;">
+      <span class="timing" style="background: #ED8936;">夏頃オープン予定</span>
+      <h4>就労継続支援B型<br>新事業所</h4>
+      <p>働く意欲のある利用者さんを支える。ドリプロの新しいフィールド。事業の幅がさらに広がります</p>
+      <span class="essence" style="background: #FEEBC8; color: #9C4221;">新たなフィールド</span>
+    </div>
+    <div class="roadmap-card" style="border-top: 4px solid #E53E3E;">
+      <span class="timing" style="background: #E53E3E;">4期中に進める</span>
+      <h4>M&A<br>全国展開への第一歩</h4>
+      <p>既存の事業所を引き継ぎドリプロ流に。M&Aのやり方を型化して広げていく。まずは1件目の成功モデルをつくる</p>
+      <span class="essence" style="background: #FFF5F5; color: #9B2C2C;">全国展開の足がかり</span>
+    </div>
+    <div class="roadmap-card" style="border-top: 4px solid #D69E2E;">
+      <span class="timing" style="background: #D69E2E;">4期・最重要</span>
+      <h4>働きやすい会社の<br>文化をつくる</h4>
+      <p>自分らしく働く職員が自分らしく生きる利用者を支えられる。みんなで作り上げていくもの</p>
+      <span class="essence" style="background: #FEFCBF; color: #975A16;">全ての基盤</span>
+    </div>
+  </div>
+
+  <!-- ===== ビジョン ===== -->
+  <div class="section-header">
+    <span class="num">08</span>
+    <h2>5期以降・ドリプロのビジョン</h2>
+  </div>
+
+  <div class="vision-box">
+    <div class="label">5期以降・ドリプロのビジョン</div>
+    <h3>ドリプロを、全国の見本にする。</h3>
+    <p style="font-size: 0.9em; opacity: 0.7;">岐阜県初・全国的にも前例のないプロジェクトが動き出します</p>
+    <div class="pillars">
+      <div class="pillar">
+        <div style="font-size: 0.7em; opacity: 0.6; margin-bottom: 4px;">包括型モデルの構築</div>
+        <h4>岐阜県初<br>前例のない事業モデル</h4>
+        <p>全国から見学が来るようなモデル事業所をつくる。リアルの現場を作り上げる。</p>
+        <div style="font-size: 0.8em; font-weight: 700; color: #F7B759; margin-top: 8px;">全国のスタンダードを変える</div>
+      </div>
+      <div class="pillar">
+        <div style="font-size: 0.7em; opacity: 0.6; margin-bottom: 4px;">M&Aで全国へ</div>
+        <h4>全国展開スキームを<br>作って広げる</h4>
+        <p>M&Aのやり方を型化して誰でも再現できるように。ドリプロ流の経営を全国に届けていく。</p>
+        <div style="font-size: 0.8em; font-weight: 700; color: #F7B759; margin-top: 8px;">全国15,000事業所へ</div>
+      </div>
+      <div class="pillar">
+        <div style="font-size: 0.7em; opacity: 0.6; margin-bottom: 4px;">業界の常識を変える</div>
+        <h4>リーディングカンパニーへ<br>福祉のイメージを変える</h4>
+        <p>「福祉＝大変・安い」ではなく「やりがいがある・楽しい」へ。ドリプロがその見本を示していく。</p>
+        <div style="font-size: 0.8em; font-weight: 700; color: #F7B759; margin-top: 8px;">日本を元気にする</div>
+      </div>
+    </div>
+    <p style="margin-top: 20px; font-size: 0.95em; font-weight: 700; color: #F7B759;">そのためにまず ―― 私たち自身が、自分らしく生き生きと働いていることが出発点。</p>
+  </div>
+
+  <!-- ===== まとめ ===== -->
+  <div class="section-header">
+    <span class="num">09</span>
+    <h2>働きやすい会社は、みんなで育てていくもの。</h2>
+  </div>
+
+  <div class="closing">
+    <div class="closing-card" style="border-top: 4px solid var(--navy);">
+      <div class="num">01</div>
+      <h4>自分らしさを知ろう</h4>
+      <p>人と違って当たり前。違いを知ることが自分らしさの発見になる。利用者さんの「その人らしさ」にも目を向けていこう。</p>
+      <div class="bottom">まず自分を知ることから</div>
+    </div>
+    <div class="closing-card" style="border-top: 4px solid var(--orange);">
+      <div class="num">02</div>
+      <h4>声を出してほしい</h4>
+      <p>モヤモヤも違和感もアイデアも提案も全部歓迎。「こうしたらどうかな」が会社を変えていく一番の力になります。</p>
+      <div class="bottom">対話を大切にしよう</div>
+    </div>
+    <div class="closing-card" style="border-top: 4px solid #38A169;">
+      <div class="num">03</div>
+      <h4>一緒にやろう</h4>
+      <p>つむぎがスタートした。B型も夏に生まれる。M&Aも動き出す。全国へ広げていく。その出発点は、ここにいるみなさんです。</p>
+      <div class="bottom">第4期、よろしくお願いします</div>
+    </div>
+  </div>
+
+  <!-- ===== 議事録 ===== -->
+  <div class="section-header">
+    <span class="num">10</span>
+    <h2>議事録</h2>
+    <p>全社集会で決まったこと・共有されたこと</p>
+  </div>
+
+  <div class="minutes-section">
+    <div class="meta-info">
+      <span>📅 2026年4月1日</span>
+      <span>📍 本部事業所（ギブリ）</span>
+      <span>👥 約30名参加</span>
+    </div>
+
+    <details>
+      <summary>組織体制・指揮命令系統</summary>
+      <div class="content">
+        <ul>
+          <li><strong>営業部の新設</strong> ― 柴田さんらの責任者の下に各事業部を配置</li>
+          <li><strong>報告ラインの徹底</strong> ― 組織崩壊防止のため、指示系統の階層を飛び越えない（直属上司への報告・相談を原則とする）</li>
+          <li><strong>総務の報告ライン</strong> ― 代表および横山さんとする</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>事業展開</summary>
+      <div class="content">
+        <ul>
+          <li><strong>グループホーム「つむぎ」</strong> ― 指定認可が降り、本日よりスタート。ワンルームタイプで精神障害への適性が高い</li>
+          <li><strong>就労継続支援B型・新事業所</strong> ― 8月頃オープン予定。パソコンが苦手な層への受け皿を強化</li>
+          <li><strong>M&Aの推進</strong> ― 日本中に自社事業所を展開し、各地域のモデル拠点を作る</li>
+          <li><strong>相談支援事業所（名称未定）</strong> ― 柴田さんを中心に推進</li>
+          <li><strong>動画部門</strong> ― 統括責任者に中島さんが着任。教育コンテンツ制作やSNS、外部動画制作を強化</li>
+          <li><strong>重度障害者グループホーム</strong> ― 岐阜県初の前例のないモデルとして第5期・6期での立ち上げを計画</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>勤務ルール・環境整備</summary>
+      <div class="content">
+        <ul>
+          <li><strong>呼称</strong> ― 役職に関わらず苗字に「さん」付けを徹底</li>
+          <li><strong>拠点</strong> ― 本部事業所「ひのめ（陽の芽）」に役員・総務が常駐。あかね・ギブリとの三拠点運用</li>
+          <li><strong>規定の確認</strong> ― 来週中に三拠点へ規定ファイルを設置。各自内容を確認すること</li>
+          <li><strong>ジョブカン運用</strong> ― 有給・休暇・出張の入力徹底。申請前に直属上司の許可を得ること。急な欠勤は必ず総務へ連絡</li>
+          <li><strong>働きやすさ</strong> ― フリーコース等の導入、有給休暇の積極的な取得推奨（法令遵守）</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>今後の予定・期限</summary>
+      <div class="content">
+        <ul>
+          <li><strong>4月2日</strong> ― 動画部門統括・中島さん着任</li>
+          <li><strong>4月6日</strong> ― パートタイマー1名加入予定</li>
+          <li><strong>来週中</strong> ― 各拠点への規定ファイル設置</li>
+                    <li><strong>8月</strong> ― 新B型事業所オープン予定</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+</div>
+
+<footer>
+  <p>ドリームプロジェクトジャパン株式会社 | 第4期 全社集会 2026年4月1日</p>
+  <p style="margin-top: 4px; font-size: 0.9em;">自分らしく生きる人を増やして日本を元気にする</p>
+</footer>
+
+</body>
+</html>

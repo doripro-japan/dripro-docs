@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>各種規定 | ドリプロ</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+  :root {
+    --navy: #1A365D;
+    --orange: #F7B759;
+    --mint: #8EC7C4;
+    --coral: #ED848D;
+    --teal: #2B6CB0;
+    --text: #333;
+    --text-light: #666;
+    --bg: #F8FAFC;
+    --white: #FFFFFF;
+    --border: #E8EDF2;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Noto Sans JP', sans-serif; color: var(--text); line-height: 1.8; background: var(--bg); }
+
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #2C5282 100%);
+    color: white; text-align: center; padding: 48px 20px 40px; position: relative;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, #D9BAD6, #ACD4E6, #8EC7C4, #F5E033, #F7B759, #ED848D, #F7DB84);
+  }
+  .hero h1 { font-size: 1.8em; font-weight: 900; margin-bottom: 8px; }
+  .hero p { opacity: 0.8; font-size: 0.95em; }
+
+  .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+  .back-link { display: inline-block; margin: 20px 0 0; font-size: 0.85em; color: var(--teal); text-decoration: none; }
+  .back-link:hover { text-decoration: underline; }
+
+  .notice {
+    background: #FFFBEB; border: 1px solid #F59E0B; border-radius: 12px;
+    padding: 16px 20px; margin: 24px 0; font-size: 0.9em;
+  }
+  .notice strong { color: #92400E; }
+
+  .section-title {
+    display: flex; align-items: center; gap: 10px; margin: 32px 0 16px;
+  }
+  .section-title .badge {
+    font-size: 0.7em; font-weight: 700; padding: 3px 12px; border-radius: 12px; color: white;
+  }
+  .section-title h2 { font-size: 1.15em; font-weight: 700; color: var(--navy); }
+
+  .file-card {
+    background: white; border-radius: 12px; padding: 18px 22px;
+    margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--text); border-left: 4px solid var(--navy);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .file-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .file-card .info { flex: 1; }
+  .file-card .info h3 { font-size: 1em; font-weight: 700; color: var(--navy); margin-bottom: 2px; }
+  .file-card .info p { font-size: 0.8em; color: var(--text-light); }
+  .file-card .btns { display: flex; gap: 8px; flex-shrink: 0; }
+  .btn {
+    border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.78em;
+    font-weight: 700; cursor: pointer; white-space: nowrap; text-decoration: none;
+    transition: opacity 0.15s; display: inline-block; text-align: center;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-view { background: #EBF4FF; color: var(--navy); }
+  .btn-dl { background: var(--navy); color: white; }
+
+  .file-card.giburi { border-left-color: #6B46C1; }
+  .file-card.giburi .info h3 { color: #6B46C1; }
+  .btn-view-g { background: #F3E8FF; color: #6B46C1; }
+  .btn-dl-g { background: #6B46C1; color: white; }
+
+  /* ビューア */
+  .viewer-overlay {
+    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;
+  }
+  .viewer-overlay.active { display: flex; }
+  .viewer-box {
+    background: white; border-radius: 16px; width: 90vw; height: 90vh;
+    max-width: 1000px; display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .viewer-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .viewer-header h3 { font-size: 1em; font-weight: 700; color: var(--navy); }
+  .viewer-close {
+    background: none; border: 2px solid var(--border); border-radius: 8px;
+    padding: 4px 14px; font-size: 0.85em; cursor: pointer; color: var(--text-light);
+    font-weight: 700; transition: background 0.15s;
+  }
+  .viewer-close:hover { background: #FFF5F5; border-color: #E53E3E; color: #E53E3E; }
+  .viewer-body { flex: 1; }
+  .viewer-body iframe { width: 100%; height: 100%; border: none; }
+
+  footer { text-align: center; padding: 32px 20px; color: #999; font-size: 0.8em; border-top: 1px solid var(--border); margin-top: 40px; }
+
+  @media (max-width: 600px) {
+    .file-card { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .file-card .btns { width: 100%; }
+    .btn { flex: 1; text-align: center; }
+    .viewer-box { width: 98vw; height: 95vh; border-radius: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>ドリプロ 各種規定</h1>
+  <p>就業規則・給与規程・各種ルールを閲覧・ダウンロードできます</p>
+</div>
+
+<div class="container">
+  <a href="index.html" class="back-link">&larr; ドキュメント一覧に戻る</a>
+
+  <div class="notice">
+    <strong>必ず確認してください</strong> ― 入社時に配布した規定ファイルと同じ内容です。不明点があれば総務または横山さんに確認してください。
+  </div>
+
+  <!-- 全社共通 -->
+  <div class="section-title">
+    <span class="badge" style="background: var(--navy);">全社共通</span>
+    <h2>全社共通の規定</h2>
+  </div>
+
+  <div class="file-card">
+    <div class="info">
+      <h3>01 就業規則</h3>
+      <p>勤務時間・休日・服務規律・懲戒など基本ルール</p>
+    </div>
+    <div class="btns">
+      <span class="btn btn-view" onclick="openViewer('01 就業規則', 'kitei/01_就業規則.docx')">閲覧</span>
+      <a class="btn btn-dl" href="kitei/01_就業規則.docx" download>ダウンロード</a>
+    </div>
+  </div>
+
+  <div class="file-card">
+    <div class="info">
+      <h3>02 正社員給与規程</h3>
+      <p>基本給・手当・賞与・昇給の計算方法</p>
+    </div>
+    <div class="btns">
+      <span class="btn btn-view" onclick="openViewer('02 正社員給与規程', 'kitei/02_正社員給与規程.docx')">閲覧</span>
+      <a class="btn btn-dl" href="kitei/02_正社員給与規程.docx" download>ダウンロード</a>
+    </div>
+  </div>
+
+  <div class="file-card">
+    <div class="info">
+      <h3>02-2 パートタイマー給与規定</h3>
+      <p>時給・手当・有給休暇の計算方法</p>
+    </div>
+    <div class="btns">
+      <span class="btn btn-view" onclick="openViewer('02-2 パートタイマー給与規定', 'kitei/02‐2_パートタイマー給与規定.docx')">閲覧</span>
+      <a class="btn btn-dl" href="kitei/02‐2_パートタイマー給与規定.docx" download>ダウンロード</a>
+    </div>
+  </div>
+
+  <div class="file-card">
+    <div class="info">
+      <h3>03 旅費規程</h3>
+      <p>出張時の交通費・宿泊費・日当の基準</p>
+    </div>
+    <div class="btns">
+      <span class="btn btn-view" onclick="openViewer('03 旅費規程', 'kitei/03_旅費規程.docx')">閲覧</span>
+      <a class="btn btn-dl" href="kitei/03_旅費規程.docx" download>ダウンロード</a>
+    </div>
+  </div>
+
+  <div class="file-card">
+    <div class="info">
+      <h3>04 社内経費精算ルール</h3>
+      <p>経費申請の手順・対象・提出期限</p>
+    </div>
+    <div class="btns">
+      <span class="btn btn-view" onclick="openViewer('04 社内経費精算ルール', 'kitei/04_社内経費精算ルール.docx')">閲覧</span>
+      <a class="btn btn-dl" href="kitei/04_社内経費精算ルール.docx" download>ダウンロード</a>
+    </div>
+  </div>
+
+  <div class="file-card">
+    <div class="info">
+      <h3>05 決裁権限規程</h3>
+      <p>金額別の決裁ライン・承認フロー</p>
+    </div>
+    <div class="btns">
+      <span class="btn btn-view" onclick="openViewer('05 決裁権限規程', 'kitei/05_決裁権限規程.docx')">閲覧</span>
+      <a class="btn btn-dl" href="kitei/05_決裁権限規程.docx" download>ダウンロード</a>
+    </div>
+  </div>
+
+  <div class="file-card">
+    <div class="info">
+      <h3>05 特別休暇規定</h3>
+      <p>慶弔休暇・リフレッシュ休暇・その他の特別休暇</p>
+    </div>
+    <div class="btns">
+      <span class="btn btn-view" onclick="openViewer('05 特別休暇規定', 'kitei/05_特別休暇規定.docx')">閲覧</span>
+      <a class="btn btn-dl" href="kitei/05_特別休暇規定.docx" download>ダウンロード</a>
+    </div>
+  </div>
+
+  <div class="file-card">
+    <div class="info">
+      <h3>06 慶弔規程</h3>
+      <p>慶弔見舞金・弔慰金の支給基準</p>
+    </div>
+    <div class="btns">
+      <span class="btn btn-view" onclick="openViewer('06 慶弔規程', 'kitei/06_慶弔規程.docx')">閲覧</span>
+      <a class="btn btn-dl" href="kitei/06_慶弔規程.docx" download>ダウンロード</a>
+    </div>
+  </div>
+
+  <!-- ギブリ専用 -->
+  <div class="section-title">
+    <span class="badge" style="background: #6B46C1;">ギブリ専用</span>
+    <h2>ギブリ事業所の規定</h2>
+  </div>
+
+  <div class="file-card giburi">
+    <div class="info">
+      <h3>01-2 就業規則（ギブリ）</h3>
+      <p>ギブリ事業所向けの就業規則</p>
+    </div>
+    <div class="btns">
+      <span class="btn btn-view-g" onclick="openViewer('01-2 就業規則（ギブリ）', 'kitei/01‐2_就業規則（ギブリ）.docx')">閲覧</span>
+      <a class="btn btn-dl-g" href="kitei/01‐2_就業規則（ギブリ）.docx" download>ダウンロード</a>
+    </div>
+  </div>
+
+  <div class="file-card giburi">
+    <div class="info">
+      <h3>05-2 特別休暇規定（ギブリ）</h3>
+      <p>ギブリ事業所向けの特別休暇規定</p>
+    </div>
+    <div class="btns">
+      <span class="btn btn-view-g" onclick="openViewer('05-2 特別休暇規定（ギブリ）', 'kitei/05-2_特別休暇規定（ギブリ）.docx')">閲覧</span>
+      <a class="btn btn-dl-g" href="kitei/05-2_特別休暇規定（ギブリ）.docx" download>ダウンロード</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ビューアオーバーレイ -->
+<div class="viewer-overlay" id="viewer" onclick="closeViewer(event)">
+  <div class="viewer-box" onclick="event.stopPropagation()">
+    <div class="viewer-header">
+      <h3 id="viewer-title">規定名</h3>
+      <button class="viewer-close" onclick="closeViewer()">閉じる</button>
+    </div>
+    <div class="viewer-body">
+      <iframe id="viewer-iframe" src=""></iframe>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2026 ドリームプロジェクトジャパン株式会社</p>
+</footer>
+
+<script>
+  const BASE = 'https://soft-valkyrie-b7b4a5.netlify.app/';
+
+  function openViewer(title, filePath) {
+    const fileUrl = encodeURIComponent(BASE + filePath);
+    const viewerUrl = 'https://docs.google.com/gview?url=' + fileUrl + '&embedded=true';
+    document.getElementById('viewer-title').textContent = title;
+    document.getElementById('viewer-iframe').src = viewerUrl;
+    document.getElementById('viewer').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeViewer(e) {
+    if (e && e.target !== document.getElementById('viewer')) return;
+    document.getElementById('viewer').classList.remove('active');
+    document.getElementById('viewer-iframe').src = '';
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeViewer();
+  });
+</script>
+
+</body>
+</html>

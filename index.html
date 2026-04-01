@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ドリプロ 社内ドキュメント</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+  :root {
+    --navy: #1A365D;
+    --orange: #F7B759;
+    --mint: #8EC7C4;
+    --coral: #ED848D;
+    --blue: #1565C0;
+    --text: #333;
+    --text-light: #666;
+    --bg: #F8FAFC;
+    --white: #FFFFFF;
+    --border: #E8EDF2;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    line-height: 1.7;
+    background: var(--bg);
+  }
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #2C5282 100%);
+    color: white;
+    text-align: center;
+    padding: 56px 20px 48px;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #D9BAD6, #ACD4E6, #8EC7C4, #F5E033, #F7B759, #ED848D, #F7DB84);
+  }
+  .hero h1 { font-size: 2em; font-weight: 900; margin-bottom: 8px; }
+  .hero p { opacity: 0.8; font-size: 0.95em; }
+  .hero .sub { font-size: 0.8em; opacity: 0.5; margin-top: 12px; }
+  .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 40px 0 16px;
+  }
+  .section-title .badge {
+    font-size: 0.7em;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 12px;
+    color: white;
+  }
+  .section-title h2 {
+    font-size: 1.15em;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+    border-left: 5px solid var(--navy);
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .card.required { border-left-color: var(--coral); }
+  .card.required::after {
+    content: '必読';
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: #FDEEF0;
+    color: #7A1A28;
+    font-size: 0.7em;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+  .card.recommend { border-left-color: var(--orange); }
+  .card.recommend::after {
+    content: 'おすすめ';
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: #FEF4E2;
+    color: #7A4A10;
+    font-size: 0.7em;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+  .card.fun { border-left-color: var(--mint); }
+  .card.fun::after {
+    content: '時間ある時に';
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: #E5F5F4;
+    color: #1A5A58;
+    font-size: 0.7em;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+  .card h3 { font-size: 1.05em; color: var(--navy); margin-bottom: 4px; padding-right: 80px; }
+  .card p { font-size: 0.85em; color: var(--text-light); margin-bottom: 8px; }
+  .card .meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.75em;
+    color: #999;
+  }
+  .card .meta span { display: flex; align-items: center; gap: 4px; }
+
+  .coming-soon {
+    background: var(--bg);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 18px 24px;
+    margin-bottom: 12px;
+    color: #999;
+  }
+  .coming-soon h3 { font-size: 0.95em; color: #BBB; margin-bottom: 2px; }
+  .coming-soon p { font-size: 0.8em; }
+
+  .help-box {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 40px 0;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .help-box h3 { font-size: 1em; color: var(--navy); margin-bottom: 8px; }
+  .help-box p { font-size: 0.85em; color: var(--text-light); }
+
+  footer {
+    text-align: center;
+    padding: 32px 20px;
+    color: #999;
+    font-size: 0.8em;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+
+  /* ===== AIチャットパネル ===== */
+  .ai-fab {
+    position: fixed; bottom: 24px; right: 24px; z-index: 1000;
+    width: 60px; height: 60px; border-radius: 50%; border: none;
+    background: linear-gradient(135deg, #1A365D, #2C5282);
+    color: white; font-size: 26px; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(26,54,93,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ai-fab:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(26,54,93,0.5); }
+  .ai-fab .dot { position: absolute; top: 8px; right: 8px; width: 12px; height: 12px; border-radius: 50%; background: #48BB78; border: 2px solid white; }
+
+  .ai-panel {
+    position: fixed; bottom: 96px; right: 24px; z-index: 999;
+    width: 420px; height: 520px; background: white;
+    border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+    display: none; flex-direction: column; overflow: hidden;
+    font-family: 'Noto Sans JP', sans-serif;
+    animation: aiSlideIn 0.25s ease-out;
+    min-width: 320px; min-height: 300px;
+  }
+  .ai-panel.open { display: flex; }
+  @keyframes aiSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .ai-header {
+    padding: 16px 20px; background: linear-gradient(135deg, #1A365D, #2C5282);
+    color: white; display: flex; justify-content: space-between; align-items: center;
+  }
+  .ai-header h3 { font-size: 0.95em; font-weight: 700; margin: 0; }
+  .ai-header .close-btn { background: none; border: none; color: white; font-size: 18px; cursor: pointer; opacity: 0.7; }
+  .ai-header .close-btn:hover { opacity: 1; }
+
+  .ai-body { flex: 1; overflow-y: auto; padding: 16px; min-height: 300px; }
+  .ai-msg { margin-bottom: 12px; display: flex; }
+  .ai-msg.user { justify-content: flex-end; }
+  .ai-msg .bubble {
+    max-width: 85%; padding: 10px 14px; border-radius: 12px;
+    font-size: 0.85em; line-height: 1.7; white-space: pre-wrap;
+  }
+  .ai-msg.user .bubble { background: #1A365D; color: white; border-bottom-right-radius: 4px; }
+  .ai-msg.ai .bubble { background: #F0F4F8; color: #333; border-bottom-left-radius: 4px; }
+  .ai-msg .ref-link {
+    display: inline-block; margin-top: 6px; padding: 2px 8px;
+    background: #EBF8FF; color: #2B6CB0; border-radius: 6px;
+    font-size: 0.75em; font-weight: 600; text-decoration: none; cursor: pointer;
+  }
+  .ai-msg .ref-link:hover { background: #BEE3F8; }
+  .ai-typing { color: #999; font-size: 0.8em; padding: 4px 0; }
+
+  .ai-footer {
+    padding: 12px 16px; border-top: 1px solid #E8EDF2;
+    display: flex; gap: 8px;
+  }
+  .ai-footer textarea {
+    flex: 1; padding: 10px 14px; border-radius: 10px;
+    border: 1px solid #E8EDF2; font-size: 0.85em; outline: none;
+    font-family: 'Noto Sans JP', sans-serif;
+    resize: none; min-height: 40px; max-height: 120px;
+    line-height: 1.5;
+  }
+  .ai-footer textarea:focus { border-color: #2B6CB0; }
+  .ai-footer button {
+    padding: 8px 16px; border-radius: 10px; border: none;
+    background: #1A365D; color: white; font-weight: 700;
+    font-size: 0.85em; cursor: pointer;
+  }
+  .ai-footer button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .ai-setup {
+    padding: 20px; text-align: center;
+  }
+  .ai-setup input {
+    width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #E8EDF2;
+    font-size: 0.85em; margin: 8px 0; font-family: 'Noto Sans JP', sans-serif;
+  }
+  .ai-setup button {
+    padding: 8px 20px; border-radius: 8px; border: none;
+    background: #1A365D; color: white; font-weight: 700; cursor: pointer;
+    margin-top: 8px;
+  }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.5em; }
+    .ai-panel { width: calc(100vw - 32px); right: 16px; bottom: 88px; max-height: 70vh; }
+    .ai-fab { bottom: 16px; right: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>ドリプロ 社内ドキュメント</h1>
+  <p>マニュアル・ガイド・研修資料をまとめています</p>
+  <p class="sub">ドリームプロジェクトジャパン株式会社</p>
+</div>
+
+<div class="container">
+
+  <!-- 最新の全社集会 -->
+  <div class="section-title">
+    <span class="badge" style="background: #1A365D;">NEW</span>
+    <h2>第4期 全社集会（2026.4.1）</h2>
+  </div>
+
+  <a class="card required" href="4ki-zensha.html" style="border-left-color: #1A365D;">
+    <h3>第4期 全社集会 ― 理念・行動指針・4期の展望</h3>
+    <p>理念「自分らしく生きる人を増やして日本を元気にする」、8つの行動指針、4期でやること、5期以降のビジョンをまとめています。</p>
+    <div class="meta">
+      <span>📖 読了目安 10分</span>
+      <span>👤 全職員必読</span>
+      <span>🔄 2026年4月1日</span>
+    </div>
+  </a>
+
+  <!-- まず読むもの -->
+  <div class="section-title">
+    <span class="badge" style="background: #ED848D;">STEP 1</span>
+    <h2>まず読んでください</h2>
+  </div>
+
+  <a class="card required" href="claude-manual.html">
+    <h3>Claude活用マニュアル</h3>
+    <p>Claudeと一緒に働くための基礎知識。Claudeの仕組み・使い方・注意点を丁寧に解説しています。</p>
+    <div class="meta">
+      <span>📖 読了目安 10分</span>
+      <span>👤 全職員向け</span>
+      <span>🔄 2026年3月更新</span>
+    </div>
+  </a>
+
+  <a class="card required" href="ai-partnership.html">
+    <h3>AIと一緒に — AIパートナーシップガイド</h3>
+    <p>AIをただの道具ではなく、一緒に成長するパートナーとして向き合うための3つの基本姿勢と実践例。</p>
+    <div class="meta">
+      <span>📖 読了目安 5分</span>
+      <span>👤 全職員向け</span>
+      <span>🔄 2026年4月更新</span>
+    </div>
+  </a>
+
+  <!-- 開発に関わる人 -->
+  <div class="section-title">
+    <span class="badge" style="background: #F7B759; color: #1A2A3A;">STEP 2</span>
+    <h2>コード開発に関わる人は読んでください</h2>
+  </div>
+
+  <a class="card recommend" href="github-guide.html">
+    <h3>GitHub運用ガイド</h3>
+    <p>Pull/Pushの仕組み、1日の作業の流れ、衝突が起きた時の対応方法をわかりやすく解説。</p>
+    <div class="meta">
+      <span>📖 読了目安 5分</span>
+      <span>👤 開発メンバー向け</span>
+      <span>🔄 2026年3月更新</span>
+    </div>
+  </a>
+
+  <!-- ツール -->
+  <div class="section-title">
+    <span class="badge" style="background: #1565C0;">TOOL</span>
+    <h2>便利ツール</h2>
+  </div>
+
+  <a class="card recommend" href="salary-simulator.html" style="border-left-color: #1565C0;">
+    <h3>月額賃金改善義務額シミュレーター</h3>
+    <p>処遇改善加算における月額賃金改善義務額を自動計算。令和4〜7年度・令和8年6月〜対応。</p>
+    <div class="meta">
+      <span>🧮 計算ツール</span>
+      <span>👤 管理者・サビ管向け</span>
+      <span>🔄 2026年3月更新</span>
+    </div>
+  </a>
+
+  <a class="card recommend" href="emergency-support-simulator.html" style="border-left-color: #1565C0;">
+    <h3>処遇改善緊急支援シミュレーター</h3>
+    <p>補助金＋加算上昇分 vs 増加人件費を自動計算。「足りるか？」を即座に判定。</p>
+    <div class="meta">
+      <span>🧮 計算ツール</span>
+      <span>👤 管理者・コンサル向け</span>
+      <span>🔄 2026年3月更新</span>
+    </div>
+  </a>
+
+  <!-- 各種規定 -->
+  <div class="section-title">
+    <span class="badge" style="background: #1A365D;">規定</span>
+    <h2>各種規定</h2>
+  </div>
+
+  <a class="card required" href="kitei.html" style="border-left-color: #1A365D;">
+    <h3>ドリプロ 各種規定（就業規則・給与規程 他10件）</h3>
+    <p>就業規則・給与規程・旅費規程・経費精算ルール・決裁権限規程・特別休暇規定・慶弔規程。ギブリ専用規定も含む。</p>
+    <div class="meta">
+      <span>📋 全10ファイル</span>
+      <span>👤 全職員必読</span>
+      <span>🔄 2026年4月更新</span>
+    </div>
+  </a>
+
+  <!-- 組織図 -->
+  <div class="section-title">
+    <span class="badge" style="background: #2F855A;">組織</span>
+    <h2>組織図</h2>
+  </div>
+
+  <a class="card fun" href="https://script.google.com/macros/s/AKfycbx1XcSAc2Xu-6laSZs_4pkgdaa89TzWXGgNbHXhl804ggAL_CERJfZk5PM10xE3Mbg/exec" target="_blank" style="border-left-color: #2F855A;">
+    <h3>ドリプロ組織図（外部リンク）</h3>
+    <p>各事業部の構成・報告ライン・メンバー一覧。クリックすると別タブで開きます。</p>
+    <div class="meta">
+      <span>🏢 組織図</span>
+      <span>👤 全職員向け</span>
+      <span>🔗 Google Apps Script</span>
+    </div>
+  </a>
+
+  <!-- コンサルツール -->
+  <div class="section-title">
+    <span class="badge" style="background: #E53E3E;">LIVE</span>
+    <h2>コンサルツール</h2>
+  </div>
+
+  <a class="card recommend" href="consul-live.html" style="border-left-color: #E53E3E;">
+    <h3>リアルタイムコンサル支援（プロトタイプ）</h3>
+    <p>Zoomコンサル中に音声をリアルタイムで文字起こし。要約とAIアドバイスを同時表示。</p>
+    <div class="meta">
+      <span>🎙 音声認識ツール</span>
+      <span>👤 コンサル担当向け</span>
+      <span>🔄 2026年4月1日</span>
+    </div>
+  </a>
+
+  <!-- 準備中 -->
+  <div class="section-title">
+    <span class="badge" style="background: #8EC7C4;">COMING SOON</span>
+    <h2>準備中のドキュメント</h2>
+  </div>
+
+  <div class="coming-soon">
+    <h3>Dマスタースクール 運営マニュアル</h3>
+    <p>月次運営サイクル・LINE配信テンプレート・質問対応フロー・スタッフ役割分担</p>
+  </div>
+
+  <div class="coming-soon">
+    <h3>障害福祉 制度ガイド</h3>
+    <p>加算の仕組み・運営指導の準備・書類整備のポイント</p>
+  </div>
+
+  <!-- ヘルプ -->
+  <div class="help-box">
+    <h3>わからないことがあれば</h3>
+    <p>いつでも福冨まで聞いてください。LINEグループでも質問OKです。</p>
+  </div>
+
+</div>
+
+<footer>
+  <p>&copy; 2026 ドリームプロジェクトジャパン株式会社</p>
+</footer>
+
+<!-- ===== AIチャットパネル ===== -->
+<button class="ai-fab" id="aiFab" onclick="toggleAI()">
+  🤖
+  <span class="dot"></span>
+</button>
+
+<div class="ai-panel" id="aiPanel">
+  <!-- リサイズハンドル（左上角） -->
+  <div id="aiResizeHandle" style="position:absolute;top:0;left:0;width:16px;height:16px;cursor:nw-resize;z-index:10;"></div>
+  <div class="ai-header" id="aiHeaderBar">
+    <h3>🤖 ドリプロAI</h3>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <button class="close-btn" onclick="cycleSize()" title="サイズ変更">⤢</button>
+      <button class="close-btn" onclick="toggleAI()">✕</button>
+    </div>
+  </div>
+  <div class="ai-body" id="aiBody">
+    <!-- APIキー未設定時 -->
+    <div class="ai-setup" id="aiSetup" style="display:none;">
+      <p style="font-size:0.85em;color:#666;margin-bottom:8px;">AIを使うにはAPIキーが必要です</p>
+      <input type="password" id="aiKeyInput" placeholder="Claude APIキーを入力..." />
+      <button onclick="saveApiKey()">設定する</button>
+      <p style="font-size:0.7em;color:#999;margin-top:8px;">キーはこのブラウザにのみ保存されます</p>
+    </div>
+  </div>
+  <div class="ai-footer" id="aiFooter">
+    <textarea id="aiInput" placeholder="社内規程やマニュアルについて質問..." rows="1"></textarea>
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <button id="aiVoiceBtn" onclick="toggleVoice()" title="音声入力" style="padding:8px 10px;border-radius:10px;border:none;background:#E8EDF2;color:#333;font-size:16px;cursor:pointer;line-height:1;">🎤</button>
+      <button id="aiSend" onclick="sendAI()">送信</button>
+    </div>
+  </div>
+</div>
+
+<script src="ai-resources.js"></script>
+<script>
+(function() {
+  const KEY_STORE = 'dripro_docs_ai_key';
+  const HISTORY_STORE = 'dripro_docs_ai_history';
+  const SIZE_STORE = 'dripro_docs_ai_size';
+  let messages = [];
+  let isLoading = false;
+  let isComposing = false; // IME変換中フラグ
+  let voiceRecognition = null;
+  let isVoiceActive = false;
+
+  // サイズプリセット
+  const SIZES = [
+    { w: 420, h: 520, label: '標準' },
+    { w: 560, h: 640, label: '大きめ' },
+    { w: 720, h: 760, label: '最大' },
+  ];
+  let sizeIdx = parseInt(localStorage.getItem(SIZE_STORE) || '0');
+
+  // 初期化
+  window.addEventListener('DOMContentLoaded', () => {
+    const key = localStorage.getItem(KEY_STORE);
+    if (!key) {
+      document.getElementById('aiSetup').style.display = 'block';
+      document.getElementById('aiFooter').style.display = 'none';
+    } else {
+      document.getElementById('aiSetup').style.display = 'none';
+      document.getElementById('aiFooter').style.display = 'flex';
+      try { messages = JSON.parse(localStorage.getItem(HISTORY_STORE) || '[]'); } catch { messages = []; }
+      if (messages.length === 0) {
+        addBotMessage('こんにちは！ドリプロの社内規程やマニュアルについて何でも聞いてください。\n\n例えば：\n・「有給休暇は何日もらえますか？」\n・「出張の交通費はどう精算しますか？」\n・「慶弔休暇の日数を教えて」\n・「パートタイマーの給与体系は？」\n\n🎤 音声入力も使えます');
+      } else {
+        messages.forEach(m => renderMessage(m.role, m.content, false));
+      }
+    }
+    applySize();
+    setupTextarea();
+    setupResize();
+  });
+
+  // textarea: IME対応 + Shift+Enter改行 + 自動高さ調整
+  function setupTextarea() {
+    const ta = document.getElementById('aiInput');
+    if (!ta) return;
+    ta.addEventListener('compositionstart', () => { isComposing = true; });
+    ta.addEventListener('compositionend', () => { isComposing = false; });
+    ta.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
+        e.preventDefault();
+        sendAI();
+      }
+    });
+    ta.addEventListener('input', () => {
+      ta.style.height = 'auto';
+      ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+    });
+  }
+
+  // リサイズ（ドラッグ）
+  function setupResize() {
+    const handle = document.getElementById('aiResizeHandle');
+    const panel = document.getElementById('aiPanel');
+    if (!handle || !panel) return;
+    let startX, startY, startW, startH;
+    handle.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      startX = e.clientX; startY = e.clientY;
+      startW = panel.offsetWidth; startH = panel.offsetHeight;
+      const onMove = (ev) => {
+        const dw = startX - ev.clientX;
+        const dh = startY - ev.clientY;
+        panel.style.width = Math.max(320, startW + dw) + 'px';
+        panel.style.height = Math.max(300, startH + dh) + 'px';
+      };
+      const onUp = () => {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        document.body.style.userSelect = '';
+      };
+      document.body.style.userSelect = 'none';
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  }
+
+  // サイズ切替
+  window.cycleSize = function() {
+    sizeIdx = (sizeIdx + 1) % SIZES.length;
+    localStorage.setItem(SIZE_STORE, sizeIdx);
+    applySize();
+  };
+  function applySize() {
+    const panel = document.getElementById('aiPanel');
+    if (!panel) return;
+    const s = SIZES[sizeIdx];
+    panel.style.width = s.w + 'px';
+    panel.style.height = s.h + 'px';
+  }
+
+  window.toggleAI = function() {
+    const panel = document.getElementById('aiPanel');
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open')) {
+      setTimeout(() => document.getElementById('aiInput')?.focus(), 100);
+    }
+  };
+
+  window.saveApiKey = function() {
+    const key = document.getElementById('aiKeyInput').value.trim();
+    if (!key) return;
+    localStorage.setItem(KEY_STORE, key);
+    document.getElementById('aiSetup').style.display = 'none';
+    document.getElementById('aiFooter').style.display = 'flex';
+    addBotMessage('APIキーを設定しました！社内規程やマニュアルについて何でも聞いてください。');
+    setupTextarea();
+  };
+
+  // 音声入力
+  window.toggleVoice = function() {
+    const btn = document.getElementById('aiVoiceBtn');
+    if (isVoiceActive) {
+      if (voiceRecognition) voiceRecognition.stop();
+      isVoiceActive = false;
+      btn.style.background = '#E8EDF2';
+      btn.textContent = '🎤';
+      return;
+    }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { alert('このブラウザは音声入力に対応していません。'); return; }
+    voiceRecognition = new SR();
+    voiceRecognition.continuous = false;
+    voiceRecognition.interimResults = true;
+    voiceRecognition.lang = 'ja-JP';
+    const ta = document.getElementById('aiInput');
+    voiceRecognition.onresult = (e) => {
+      let text = '';
+      for (let i = 0; i < e.results.length; i++) {
+        text += e.results[i][0].transcript;
+      }
+      ta.value = text;
+      ta.style.height = 'auto';
+      ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+    };
+    voiceRecognition.onend = () => {
+      isVoiceActive = false;
+      btn.style.background = '#E8EDF2';
+      btn.textContent = '🎤';
+    };
+    voiceRecognition.onerror = () => {
+      isVoiceActive = false;
+      btn.style.background = '#E8EDF2';
+      btn.textContent = '🎤';
+    };
+    voiceRecognition.start();
+    isVoiceActive = true;
+    btn.style.background = '#FED7D7';
+    btn.textContent = '🔴';
+  };
+
+  function addBotMessage(text) {
+    messages.push({ role: 'assistant', content: text });
+    renderMessage('assistant', text);
+    saveHistory();
+  }
+
+  function renderMessage(role, content, scroll = true) {
+    const body = document.getElementById('aiBody');
+    const div = document.createElement('div');
+    div.className = 'ai-msg ' + (role === 'user' ? 'user' : 'ai');
+    let html = content.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+    html = html.replace(/【参照：(.+?)】/g, (_, name) => {
+      const href = getDocLink(name);
+      return href ? `<a class="ref-link" href="${href}" target="_blank">📄 ${name}を見る</a>` : `📄 ${name}`;
+    });
+    div.innerHTML = '<div class="bubble">' + html + '</div>';
+    body.appendChild(div);
+    if (scroll) body.scrollTop = body.scrollHeight;
+  }
+
+  function getDocLink(name) {
+    const map = {
+      '就業規則': 'kitei.html', 'ギブリ就業規則': 'kitei.html',
+      '正社員給与規程': 'kitei.html', 'パートタイマー給与規定': 'kitei.html',
+      '旅費規程': 'kitei.html', '社内経費精算ルール': 'kitei.html',
+      '決裁権限規程': 'kitei.html', '特別休暇規定': 'kitei.html',
+      '慶弔規程': 'kitei.html', 'Claude活用マニュアル': 'claude-manual.html',
+      'GitHub運用ガイド': 'github-guide.html',
+    };
+    for (const [k, v] of Object.entries(map)) { if (name.includes(k)) return v; }
+    return null;
+  }
+
+  function buildContext(question) {
+    if (typeof DRIPRO_RESOURCES === 'undefined') return '';
+    const q = question.toLowerCase();
+    const keywords = {
+      '就業': ['01_就業規則', '01\u20102_就業規則（ギブリ）'],
+      '給与': ['02_正社員給与規程', '02\u20102_パートタイマー給与規定'],
+      '給料': ['02_正社員給与規程', '02\u20102_パートタイマー給与規定'],
+      '賃金': ['02_正社員給与規程', '02\u20102_パートタイマー給与規定'],
+      '旅費': ['03_旅費規程'], '出張': ['03_旅費規程'],
+      '交通費': ['03_旅費規程', '02_正社員給与規程'],
+      '経費': ['04_社内経費精算ルール'], '精算': ['04_社内経費精算ルール'],
+      '決裁': ['05_決裁権限規程'],
+      '休暇': ['05_特別休暇規定', '05-2_特別休暇規定（ギブリ）', '01_就業規則'],
+      '有給': ['01_就業規則', '05_特別休暇規定'],
+      '慶弔': ['06_慶弔規程'], '結婚': ['06_慶弔規程'], '葬儀': ['06_慶弔規程'], '忌引': ['06_慶弔規程'],
+      'パート': ['02\u20102_パートタイマー給与規定', '01_就業規則'],
+      'ギブリ': ['01\u20102_就業規則（ギブリ）', '05-2_特別休暇規定（ギブリ）'],
+      '懲戒': ['01_就業規則'], '解雇': ['01_就業規則'], '勤務': ['01_就業規則'],
+      '住宅': ['02_正社員給与規程'],
+      '処遇改善': ['02_正社員給与規程', '02\u20102_パートタイマー給与規定'],
+    };
+    let matched = new Set();
+    for (const [kw, docs] of Object.entries(keywords)) {
+      if (q.includes(kw)) docs.forEach(d => matched.add(d));
+    }
+    if (matched.size === 0) Object.keys(DRIPRO_RESOURCES).forEach(k => matched.add(k));
+    let context = '';
+    for (const key of matched) {
+      const text = DRIPRO_RESOURCES[key];
+      if (text) context += '\n\n===== ' + key + ' =====\n' + text.substring(0, 2000);
+    }
+    return context;
+  }
+
+  window.sendAI = async function() {
+    if (isLoading || isComposing) return;
+    const input = document.getElementById('aiInput');
+    const question = input.value.trim();
+    if (!question) return;
+    input.value = '';
+    input.style.height = 'auto';
+    messages.push({ role: 'user', content: question });
+    renderMessage('user', question);
+    saveHistory();
+    const key = localStorage.getItem(KEY_STORE);
+    if (!key) { addBotMessage('APIキーが設定されていません。'); return; }
+    isLoading = true;
+    document.getElementById('aiSend').disabled = true;
+    const body = document.getElementById('aiBody');
+    const loading = document.createElement('div');
+    loading.className = 'ai-typing';
+    loading.textContent = '🤖 社内ドキュメントを調べています...';
+    body.appendChild(loading);
+    body.scrollTop = body.scrollHeight;
+    try {
+      const context = buildContext(question);
+      const recentHistory = messages.slice(-8).map(m => ({ role: m.role, content: m.content }));
+      const systemPrompt = 'あなたはドリームプロジェクトジャパン株式会社（ドリプロ）の社内AIアシスタントです。\n' +
+        '社内の規程・マニュアル・制度について、以下のリソースを参照して正確に回答してください。\n\n' +
+        '【重要ルール】\n' +
+        '- リソースに書かれている内容のみを根拠にして回答してください\n' +
+        '- リソースにない情報は「この点については規程に記載がないため、福冨さんまたは上長に確認してください」と案内してください\n' +
+        '- 回答の最後に、参照した規程名を【参照：○○規程】の形式で必ず記載してください\n' +
+        '- 必要に応じて「正社員ですか？パートタイマーですか？」「どの事業部に所属していますか？（ドリプロ本体？ギブリ？）」など質問してから回答してください\n' +
+        '- わかりやすく、箇条書きを使って簡潔に回答してください\n' +
+        '- 事業所の入居率・加算取得状況・職員情報など運営データについての質問は、「GHサポートシステム（https://dripro-gh-system.vercel.app）にログインして確認できます」と案内してください\n\n' +
+        '【社内ドキュメント リソース】' + context;
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1024,
+          system: systemPrompt,
+          messages: recentHistory,
+        }),
+      });
+      loading.remove();
+      if (!res.ok) {
+        addBotMessage('エラーが発生しました。APIキーを確認してください。');
+      } else {
+        const data = await res.json();
+        const answer = data.content?.[0]?.text || '回答を取得できませんでした。';
+        addBotMessage(answer);
+      }
+    } catch (e) {
+      loading.remove();
+      addBotMessage('通信エラーが発生しました: ' + e.message);
+    }
+    isLoading = false;
+    document.getElementById('aiSend').disabled = false;
+  };
+
+  function saveHistory() {
+    try { localStorage.setItem(HISTORY_STORE, JSON.stringify(messages.slice(-20))); } catch {}
+  }
+})();
+</script>
+
+</body>
+</html>
