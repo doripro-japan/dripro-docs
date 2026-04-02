@@ -12,6 +12,13 @@
   @keyframes pulse { 0%{ box-shadow:0 0 0 0 rgba(229,62,62,0.5); } 70%{ box-shadow:0 0 0 10px rgba(229,62,62,0); } 100%{ box-shadow:0 0 0 0 rgba(229,62,62,0); } }
   @keyframes fadeIn { from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
   @keyframes spin { from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+  @media (max-width: 768px) {
+    .panel-grid { flex-direction: column !important; }
+    .panel-grid > div { width: 100% !important; min-height: 300px; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .header-controls { flex-wrap: wrap; gap: 6px !important; }
+    .header-controls button { font-size: 12px !important; padding: 8px 12px !important; }
+  }
 </style>
 </head>
 <body>
@@ -20,45 +27,64 @@
 <div style="height:4px;background:linear-gradient(90deg,#D9BAD6,#ACD4E6,#8EC7C4,#F5E033,#F7B759,#ED848D,#F7DB84);"></div>
 
 <!-- Header -->
-<header id="headerBar" style="background:#1A365D;color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;">
-  <div style="display:flex;align-items:center;gap:12px;">
+<header id="headerBar" style="background:#1A365D;color:#fff;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;" class="header-controls">
     <span style="font-weight:700;font-size:18px;">DP</span>
     <input id="corpNameInput" type="text" placeholder="事業所名・会議名を入力"
-      style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:8px 14px;color:#fff;font-size:14px;width:200px;outline:none;font-family:inherit;"
+      style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:7px 12px;color:#fff;font-size:13px;width:180px;outline:none;font-family:inherit;"
     />
-    <select id="sessionMode" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:8px 12px;color:#fff;font-size:13px;outline:none;font-family:inherit;cursor:pointer;">
-      <option value="consul" style="color:#333;">コンサル</option>
-      <option value="meeting" style="color:#333;">社内会議</option>
-      <option value="training" style="color:#333;">研修・セミナー</option>
-      <option value="interview" style="color:#333;">面談・1on1</option>
-      <option value="general" style="color:#333;">汎用（フリー）</option>
-    </select>
+    <div id="modeSelector" style="position:relative;">
+      <button id="modeSelectorBtn" onclick="toggleModeDropdown()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:7px 12px;color:#fff;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;min-width:140px;">
+        <span id="modeSelectorIcon">&#127919;</span>
+        <span id="modeSelectorLabel">コンサル</span>
+        <span style="margin-left:auto;font-size:10px;">&#9660;</span>
+      </button>
+      <div id="modeDropdown" style="display:none;position:absolute;top:100%;left:0;margin-top:4px;background:#fff;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,0.2);z-index:100;min-width:280px;overflow:hidden;"></div>
+    </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
     <span id="micIndicator" style="display:none;width:12px;height:12px;border-radius:50%;background:#E53E3E;animation:blink 1s infinite;"></span>
-    <span id="timerDisplay" style="font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;min-width:100px;text-align:center;">00:00:00</span>
+    <span id="timerDisplay" style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;min-width:90px;text-align:center;">00:00:00</span>
   </div>
-  <div style="display:flex;align-items:center;gap:10px;">
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;" class="header-controls">
     <button id="btnSettings" onclick="openSettings()"
-      style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:8px 14px;font-size:14px;cursor:pointer;font-family:inherit;" title="API設定">
+      style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;font-family:inherit;" title="API設定">
       &#9881;
     </button>
     <button id="btnDashboard" onclick="showDashboard()"
-      style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:8px 14px;font-size:14px;cursor:pointer;font-family:inherit;">
-      &#128202; ダッシュボード
+      style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;font-family:inherit;">
+      &#128202; 一覧
     </button>
     <button id="btnStart" onclick="startSession()"
-      style="background:#38A169;color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">
-      コンサルを始める
+      style="background:#38A169;color:#fff;border:none;border-radius:8px;padding:9px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">
+      開始
     </button>
-    <button id="btnPause" onclick="togglePause()" style="display:none;background:#DD6B20;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">
+    <button id="btnPause" onclick="togglePause()" style="display:none;background:#DD6B20;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">
       一時停止
     </button>
-    <button id="btnStop" onclick="stopSession()" style="display:none;background:#E53E3E;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">
+    <button id="btnStop" onclick="stopSession()" style="display:none;background:#E53E3E;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">
       終了
     </button>
   </div>
 </header>
+
+<!-- Panel Toggle Bar (shown during recording) -->
+<div id="panelToggleBar" style="display:none;background:#fff;border-bottom:1px solid #E2E8F0;padding:6px 16px;display:none;align-items:center;gap:8px;flex-wrap:wrap;">
+  <div style="display:flex;gap:4px;margin-right:12px;">
+    <button onclick="setPanelPreset('4')" class="preset-btn" data-preset="4" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid #E2E8F0;background:#fff;color:#4A5568;">4分割</button>
+    <button onclick="setPanelPreset('3')" class="preset-btn" data-preset="3" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid #E2E8F0;background:#fff;color:#4A5568;">3分割</button>
+    <button onclick="setPanelPreset('2')" class="preset-btn" data-preset="2" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid #E2E8F0;background:#fff;color:#4A5568;">2分割</button>
+    <button onclick="setPanelPreset('1')" class="preset-btn" data-preset="1" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid #E2E8F0;background:#fff;color:#4A5568;">集中</button>
+  </div>
+  <div style="width:1px;height:20px;background:#E2E8F0;margin:0 4px;"></div>
+  <button onclick="togglePanel(0)" id="toggleP0" style="padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit;border:1px solid #8EC7C4;background:#F0FFF4;color:#276749;">&#128221; 文字起こし</button>
+  <button onclick="togglePanel(1)" id="toggleP1" style="padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit;border:1px solid #F7B759;background:#FFFFF0;color:#975A16;">&#128203; 要約</button>
+  <button onclick="togglePanel(2)" id="toggleP2" style="padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit;border:1px solid #64748b;background:#F8FAFC;color:#475569;">&#128211; メモ</button>
+  <button onclick="togglePanel(3)" id="toggleP3" style="padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit;border:1px solid #1A365D;background:#EBF8FF;color:#1A365D;">&#129302; AI</button>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+    <span id="currentModeBadge" style="padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;background:#4338ca;">&#127919; コンサル</span>
+  </div>
+</div>
 
 <!-- Settings Modal -->
 <div id="settingsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
@@ -122,19 +148,19 @@
   <div style="max-width:1200px;margin:0 auto;width:100%;">
 
     <!-- Dashboard Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
       <div>
         <h1 style="font-size:24px;font-weight:700;color:#1A365D;">コンサル管理</h1>
         <p style="font-size:13px;color:#718096;margin-top:4px;">過去のコンサル履歴とデータを管理します</p>
       </div>
       <button onclick="startFromDashboard()"
         style="background:linear-gradient(135deg,#38A169,#2F855A);color:#fff;border:none;border-radius:10px;padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(56,161,105,0.3);">
-        &#127908; コンサルを始める
+        &#127908; セッションを始める
       </button>
     </div>
 
     <!-- KPI Cards -->
-    <div id="kpiCards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;"></div>
+    <div id="kpiCards" class="kpi-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;"></div>
 
     <!-- API Status Banner -->
     <div id="apiBanner" style="margin-bottom:20px;"></div>
@@ -142,7 +168,7 @@
     <!-- Corp Filter -->
     <div id="corpFilter" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;"></div>
 
-    <!-- Corp Detail Panel (shown when a specific corp is selected) -->
+    <!-- Corp Detail Panel -->
     <div id="corpDetailPanel" style="display:none;margin-bottom:24px;"></div>
 
     <!-- Session List -->
@@ -157,52 +183,60 @@
   </div>
 </div>
 
-<!-- Waiting Screen (hidden by default, dashboard is default) -->
+<!-- Waiting Screen -->
 <div id="waitingScreen" style="display:none;flex-direction:column;align-items:center;justify-content:center;height:calc(100vh - 60px);gap:20px;">
   <div style="font-size:64px;">&#127908;</div>
   <h1 style="font-size:28px;font-weight:700;color:#1A365D;">リアルタイムコンサル支援</h1>
   <p style="color:#718096;font-size:16px;max-width:500px;text-align:center;line-height:1.8;">
     Zoomコンサル中に音声をリアルタイムで文字起こしし、AIが要約とアドバイスを提供します。<br>
-    事業所名を入力して「コンサルを始める」をクリックしてください。
+    事業所名を入力して「開始」をクリックしてください。
   </p>
   <div style="margin-top:16px;padding:16px 24px;background:#FFFBEB;border:1px solid #F7B759;border-radius:8px;font-size:13px;color:#975A16;">
     ブラウザのマイク許可が必要です（Chrome推奨）
   </div>
 </div>
 
-<!-- Main 3 Columns -->
-<div id="mainColumns" style="display:none;height:calc(100vh - 60px);">
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;height:100%;min-height:0;">
+<!-- Main 4-Panel Layout -->
+<div id="mainColumns" style="display:none;height:calc(100vh - 94px);">
+  <div id="panelGrid" class="panel-grid" style="display:flex;height:100%;min-height:0;">
 
-    <!-- Left: Transcript -->
-    <div style="display:flex;flex-direction:column;border-right:1px solid #E2E8F0;background:#fff;min-height:0;">
-      <div style="padding:12px 16px;background:#8EC7C4;color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        <span style="font-size:18px;">&#128221;</span> リアルタイム文字起こし
-        <span id="sentenceCount" style="margin-left:auto;font-size:12px;font-weight:400;opacity:0.9;">0 発言</span>
+    <!-- Panel 0: Transcript -->
+    <div id="panel0" class="live-panel" style="display:flex;flex-direction:column;border-right:1px solid #E2E8F0;background:#fff;min-height:0;overflow:hidden;">
+      <div style="padding:10px 14px;background:#8EC7C4;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+        <span style="font-size:16px;">&#128221;</span> リアルタイム文字起こし
+        <span id="sentenceCount" style="margin-left:auto;font-size:11px;font-weight:400;opacity:0.9;">0 発言</span>
       </div>
-      <div id="transcriptArea" style="flex:1;overflow-y:auto;padding:16px;font-size:14px;line-height:1.8;min-height:0;">
-        <div style="color:#A0AEC0;text-align:center;padding:40px 0;">音声を認識しています...</div>
+      <div id="transcriptArea" style="flex:1;overflow-y:auto;padding:14px;font-size:13px;line-height:1.8;min-height:0;">
+        <div data-placeholder style="color:#A0AEC0;text-align:center;padding:40px 0;">音声を認識しています...</div>
       </div>
     </div>
 
-    <!-- Center: Summary -->
-    <div style="display:flex;flex-direction:column;border-right:1px solid #E2E8F0;background:#fff;min-height:0;">
-      <div style="padding:12px 16px;background:#F7B759;color:#1A365D;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        <span style="font-size:18px;">&#128203;</span> リアルタイム要約
-        <span id="summaryAiBadge" style="margin-left:auto;font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(0,0,0,0.1);"></span>
+    <!-- Panel 1: Summary -->
+    <div id="panel1" class="live-panel" style="display:flex;flex-direction:column;border-right:1px solid #E2E8F0;background:#fff;min-height:0;overflow:hidden;">
+      <div style="padding:10px 14px;background:#F7B759;color:#1A365D;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+        <span style="font-size:16px;">&#128203;</span> リアルタイム要約
+        <span id="summaryAiBadge" style="margin-left:auto;font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(0,0,0,0.1);"></span>
       </div>
-      <div id="summaryArea" style="flex:1;overflow-y:auto;padding:16px;font-size:14px;line-height:1.8;min-height:0;">
+      <div id="summaryArea" style="flex:1;overflow-y:auto;padding:14px;font-size:13px;line-height:1.8;min-height:0;">
         <div style="color:#A0AEC0;text-align:center;padding:40px 0;">発言が蓄積されると要約を生成します</div>
       </div>
     </div>
 
-    <!-- Right: AI Advisor -->
-    <div style="display:flex;flex-direction:column;background:#F7FAFC;min-height:0;">
-      <div style="padding:12px 16px;background:#1A365D;color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        <span style="font-size:18px;">&#129302;</span> AI アドバイザー
-        <span id="adviceAiBadge" style="margin-left:auto;font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.2);color:#fff;"></span>
+    <!-- Panel 2: Memo -->
+    <div id="panel2" class="live-panel" style="display:flex;flex-direction:column;border-right:1px solid #E2E8F0;background:#fff;min-height:0;overflow:hidden;">
+      <div style="padding:10px 14px;background:#64748b;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+        <span style="font-size:16px;">&#128211;</span> メモ
       </div>
-      <div id="adviceArea" style="flex:1;overflow-y:auto;padding:16px;font-size:14px;line-height:1.8;min-height:0;">
+      <textarea id="memoArea" placeholder="ここに自由にメモを入力できます..." style="flex:1;padding:14px;font-size:13px;line-height:1.8;font-family:'Noto Sans JP',sans-serif;border:none;outline:none;resize:none;min-height:0;background:#FAFAFA;"></textarea>
+    </div>
+
+    <!-- Panel 3: AI Advisor -->
+    <div id="panel3" class="live-panel" style="display:flex;flex-direction:column;background:#F7FAFC;min-height:0;overflow:hidden;">
+      <div style="padding:10px 14px;background:#1A365D;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+        <span style="font-size:16px;">&#129302;</span> AI アドバイザー
+        <span id="adviceAiBadge" style="margin-left:auto;font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.2);color:#fff;"></span>
+      </div>
+      <div id="adviceArea" style="flex:1;overflow-y:auto;padding:14px;font-size:13px;line-height:1.8;min-height:0;">
         <div style="color:#A0AEC0;text-align:center;padding:40px 0;">AIがコンサル内容を分析します</div>
       </div>
     </div>
@@ -213,8 +247,8 @@
 <!-- Result Screen -->
 <div id="resultScreen" style="display:none;height:calc(100vh - 60px);overflow-y:auto;padding:32px;">
   <div style="max-width:900px;margin:0 auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
-      <h2 style="font-size:22px;font-weight:700;">コンサル完了</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px;">
+      <h2 style="font-size:22px;font-weight:700;">セッション完了</h2>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button id="btnCopyTranscript" onclick="copyTranscript()" style="background:#1A365D;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">
           &#128203; コピー
@@ -229,44 +263,38 @@
     </div>
     <div id="resultMeta" style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;"></div>
 
-    <!-- AI Actions -->
-    <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
-      <button id="btnGenMinutes" onclick="generateMinutes()" style="background:linear-gradient(135deg,#8EC7C4,#68D391);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(142,199,196,0.4);">
-        &#129302; AI議事録を生成
-      </button>
-      <button id="btnGenActions" onclick="generateActionPlan()" style="background:linear-gradient(135deg,#F7B759,#ED8936);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(247,183,89,0.4);">
-        &#127919; アクションプランを抽出
-      </button>
+    <!-- End Session Report (AI generated) -->
+    <div id="endSessionReport" style="display:none;margin-bottom:20px;">
+      <div style="background:#fff;border:1px solid #8EC7C4;border-radius:10px;padding:20px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+          <span style="font-size:18px;">&#129302;</span>
+          <h3 style="font-size:15px;font-weight:700;color:#1A365D;">AI 最終レポート</h3>
+          <button onclick="copyEndReport()" id="btnCopyEndReport" style="margin-left:auto;background:#EBF8FF;color:#3182CE;border:1px solid #BEE3F8;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:inherit;">コピー</button>
+        </div>
+        <div id="endReportSummary" style="margin-bottom:16px;"></div>
+        <div id="endReportActions" style="margin-bottom:16px;"></div>
+        <div id="endReportNext" style=""></div>
+      </div>
+    </div>
+
+    <!-- Loading indicator for end report -->
+    <div id="endReportLoading" style="display:none;margin-bottom:20px;text-align:center;padding:20px;">
+      <span style="display:inline-block;width:20px;height:20px;border:3px solid #8EC7C4;border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:8px;"></span>
+      AI最終レポートを生成中...
     </div>
 
     <!-- Result Tab Switcher -->
     <div id="resultTabs" style="display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid #E2E8F0;">
       <button onclick="switchResultTab('all')" class="result-tab" data-tab="all" style="padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;border:none;background:none;color:#1A365D;border-bottom:3px solid #1A365D;margin-bottom:-2px;">すべて</button>
       <button onclick="switchResultTab('transcript')" class="result-tab" data-tab="transcript" style="padding:10px 20px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;border:none;background:none;color:#718096;border-bottom:3px solid transparent;margin-bottom:-2px;">文字起こし</button>
-      <button onclick="switchResultTab('minutes')" class="result-tab" data-tab="minutes" style="padding:10px 20px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;border:none;background:none;color:#718096;border-bottom:3px solid transparent;margin-bottom:-2px;">議事録</button>
-      <button onclick="switchResultTab('actions')" class="result-tab" data-tab="actions" style="padding:10px 20px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;border:none;background:none;color:#718096;border-bottom:3px solid transparent;margin-bottom:-2px;">アクションプラン</button>
+      <button onclick="switchResultTab('memo')" class="result-tab" data-tab="memo" style="padding:10px 20px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;border:none;background:none;color:#718096;border-bottom:3px solid transparent;margin-bottom:-2px;">メモ</button>
     </div>
 
-    <!-- AI Minutes -->
-    <div id="aiMinutesSection" style="display:none;margin-bottom:20px;" data-result-section="minutes">
-      <div style="background:#fff;border:1px solid #8EC7C4;border-radius:10px;padding:20px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-          <span style="font-size:18px;">&#129302;</span>
-          <h3 style="font-size:15px;font-weight:700;color:#1A365D;">AI 議事録</h3>
-          <button id="btnCopyMinutes" onclick="copyMinutes()" style="margin-left:auto;background:#EBF8FF;color:#3182CE;border:1px solid #BEE3F8;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:inherit;">コピー</button>
-        </div>
-        <pre id="aiMinutesContent" style="white-space:pre-wrap;word-wrap:break-word;font-family:'Noto Sans JP',sans-serif;font-size:14px;line-height:1.8;color:#2D3748;"></pre>
-      </div>
-    </div>
-
-    <!-- Action Plan -->
-    <div id="actionPlanSection" style="display:none;margin-bottom:20px;" data-result-section="actions">
-      <div style="background:#fff;border:1px solid #F7B759;border-radius:10px;padding:20px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-          <span style="font-size:18px;">&#127919;</span>
-          <h3 style="font-size:15px;font-weight:700;color:#1A365D;">アクションプラン</h3>
-        </div>
-        <div id="actionPlanContent"></div>
+    <!-- Memo Section -->
+    <div id="memoSection" style="display:none;margin-bottom:20px;" data-result-section="memo">
+      <div style="background:#fff;border:1px solid #64748b;border-radius:10px;padding:20px;">
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;color:#1A365D;">&#128211; メモ</h3>
+        <pre id="resultMemo" style="white-space:pre-wrap;word-wrap:break-word;font-family:'Noto Sans JP',sans-serif;font-size:14px;line-height:1.8;color:#2D3748;"></pre>
       </div>
     </div>
 
@@ -281,6 +309,70 @@
 </div>
 
 <script>
+// ============================================================
+// 8 Modes Definition
+// ============================================================
+var LIVE_MODES = [
+  { id: "consul",   label: "コンサル",     icon: "\uD83C\uDFAF", color: "#4338ca", desc: "障害福祉コンサルティング" },
+  { id: "progress", label: "進捗Zoom",     icon: "\uD83D\uDCC8", color: "#0d9488", desc: "事業所の進捗確認Zoom" },
+  { id: "staff",    label: "職員面談",     icon: "\uD83D\uDC65", color: "#059669", desc: "職員との1on1・相談" },
+  { id: "user",     label: "利用者面談",   icon: "\uD83E\uDD1D", color: "#0891b2", desc: "利用者・ご本人との面談" },
+  { id: "case",     label: "ケース会議",   icon: "\uD83D\uDCCB", color: "#d97706", desc: "ケース会議・支援検討会" },
+  { id: "family",   label: "親御さん面談", icon: "\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67", color: "#dc2626", desc: "ご家族・保護者との面談" },
+  { id: "eval",     label: "評価面談",     icon: "\uD83D\uDCCA", color: "#7c3aed", desc: "人事評価・目標設定面談" },
+  { id: "free",     label: "フリー",       icon: "\uD83D\uDCDD", color: "#64748b", desc: "自由メモ・その他" }
+];
+
+// ============================================================
+// Mode-specific Prompts
+// ============================================================
+var SUMMARY_PROMPTS = {
+  consul: '\u3042\u306a\u305f\u306f\u969c\u5bb3\u798f\u7949\u30b3\u30f3\u30b5\u30eb\u30bf\u30f3\u30c8\u306e\u30a2\u30b7\u30b9\u30bf\u30f3\u30c8\u3067\u3059\u3002\u4ee5\u4e0b\u306e\u4f1a\u8a71\u3092\u8981\u7d04\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u73fe\u5728\u306e\u8a71\u984c\uff1a\uff081\u884c\uff09\n\u25a0 \u30ad\u30fc\u30dd\u30a4\u30f3\u30c8\uff1a\uff08\u7b87\u6761\u66f8\u304d3\u3064\u4ee5\u5185\uff09\n\u25a0 \u672a\u89e3\u6c7a\u306e\u8ad6\u70b9\uff1a\uff08\u3042\u308c\u3070\uff09\n\u3010\u30eb\u30fc\u30eb\u3011\u4f1a\u8a71\u306b\u51fa\u3066\u3044\u306a\u3044\u8a71\u984c\u306f\u66f8\u304b\u306a\u3044\u3067\u304f\u3060\u3055\u3044\u3002\u7c21\u6f54\u306b\u3002\n---\n',
+  progress: '\u3042\u306a\u305f\u306f\u969c\u5bb3\u798f\u7949\u30b3\u30f3\u30b5\u30eb\u30bf\u30f3\u30c8\u306e\u30a2\u30b7\u30b9\u30bf\u30f3\u30c8\u3067\u3059\u3002\u4e8b\u696d\u6240\u306e\u9032\u6357\u78ba\u8a8dZoom\u4e2d\u3067\u3059\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u78ba\u8a8d\u4e2d\u306e\u9805\u76ee\uff1a\uff081\u884c\uff09\n\u25a0 \u9032\u6357\u72b6\u6cc1\uff1a\uff08\u7b87\u6761\u66f8\u304d3\u3064\u4ee5\u5185\uff09\n\u25a0 \u8ab2\u984c\u30fb\u9045\u308c\uff1a\uff08\u3042\u308c\u3070\uff09\n\u3010\u30eb\u30fc\u30eb\u3011\u4f1a\u8a71\u306b\u51fa\u3066\u3044\u306a\u3044\u8a71\u984c\u306f\u66f8\u304b\u306a\u3044\u3067\u304f\u3060\u3055\u3044\u3002\u7c21\u6f54\u306b\u3002\n---\n',
+  staff: '\u3042\u306a\u305f\u306f\u4eba\u4e8b\u9762\u8ac7\u306e\u30a2\u30b7\u30b9\u30bf\u30f3\u30c8\u3067\u3059\u3002\u4ee5\u4e0b\u306e\u4f1a\u8a71\u3092\u8981\u7d04\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u73fe\u5728\u306e\u8a71\u984c\uff1a\uff081\u884c\uff09\n\u25a0 \u30ad\u30fc\u30dd\u30a4\u30f3\u30c8\uff1a\uff08\u7b87\u6761\u66f8\u304d3\u3064\u4ee5\u5185\uff09\n\u25a0 \u6c17\u306b\u306a\u308b\u767a\u8a00\uff1a\uff08\u3042\u308c\u3070\uff09\n\u3010\u30eb\u30fc\u30eb\u3011\u4f1a\u8a71\u306b\u51fa\u3066\u3044\u306a\u3044\u8a71\u984c\u306f\u66f8\u304b\u306a\u3044\u3067\u304f\u3060\u3055\u3044\u3002\u7c21\u6f54\u306b\u3002\n---\n',
+  user: '\u3042\u306a\u305f\u306f\u969c\u5bb3\u798f\u7949\u306e\u652f\u63f4\u76f8\u8ac7\u54e1\u3067\u3059\u3002\u4ee5\u4e0b\u306e\u5229\u7528\u8005\u9762\u8ac7\u306e\u4f1a\u8a71\u3092\u8981\u7d04\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u73fe\u5728\u306e\u8a71\u984c\uff1a\uff081\u884c\uff09\n\u25a0 \u3054\u672c\u4eba\u306e\u5e0c\u671b\u30fb\u30cb\u30fc\u30ba\uff1a\uff08\u7b87\u6761\u66f8\u304d\uff09\n\u25a0 \u652f\u63f4\u4e0a\u306e\u6c17\u3065\u304d\uff1a\uff08\u3042\u308c\u3070\uff09\n\u3010\u30eb\u30fc\u30eb\u3011\u4f1a\u8a71\u306b\u51fa\u3066\u3044\u306a\u3044\u8a71\u984c\u306f\u66f8\u304b\u306a\u3044\u3067\u304f\u3060\u3055\u3044\u3002\u3054\u672c\u4eba\u306e\u8a00\u8449\u3092\u5927\u5207\u306b\u3002\n---\n',
+  case: '\u3042\u306a\u305f\u306f\u30b1\u30fc\u30b9\u4f1a\u8b70\u306e\u66f8\u8a18\u3067\u3059\u3002\u4ee5\u4e0b\u306e\u4f1a\u8b70\u306e\u4f1a\u8a71\u3092\u8981\u7d04\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u73fe\u5728\u306e\u8b70\u984c\uff1a\uff081\u884c\uff09\n\u25a0 \u5404\u767a\u8a00\u8005\u306e\u610f\u898b\uff1a\uff08\u7b87\u6761\u66f8\u304d\uff09\n\u25a0 \u6c7a\u5b9a\u4e8b\u9805\uff1a\uff08\u3042\u308c\u3070\uff09\n\u25a0 \u672a\u6c7a\u5b9a\u4e8b\u9805\uff1a\uff08\u3042\u308c\u3070\uff09\n\u3010\u30eb\u30fc\u30eb\u3011\u4f1a\u8a71\u306b\u51fa\u3066\u3044\u306a\u3044\u8a71\u984c\u306f\u66f8\u304b\u306a\u3044\u3067\u304f\u3060\u3055\u3044\u3002\n---\n',
+  family: '\u3042\u306a\u305f\u306f\u969c\u5bb3\u798f\u7949\u306e\u76f8\u8ac7\u54e1\u3067\u3059\u3002\u4ee5\u4e0b\u306e\u3054\u5bb6\u65cf\u3068\u306e\u9762\u8ac7\u306e\u4f1a\u8a71\u3092\u8981\u7d04\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u73fe\u5728\u306e\u8a71\u984c\uff1a\uff081\u884c\uff09\n\u25a0 \u3054\u5bb6\u65cf\u306e\u601d\u3044\u30fb\u8981\u671b\uff1a\uff08\u7b87\u6761\u66f8\u304d\uff09\n\u25a0 \u78ba\u8a8d\u3059\u3079\u304d\u3053\u3068\uff1a\uff08\u3042\u308c\u3070\uff09\n\u3010\u30eb\u30fc\u30eb\u3011\u611f\u60c5\u306b\u914d\u616e\u3057\u305f\u8868\u73fe\u3067\u3002\u4f1a\u8a71\u306b\u51fa\u3066\u3044\u306a\u3044\u8a71\u984c\u306f\u66f8\u304b\u306a\u3044\u3067\u304f\u3060\u3055\u3044\u3002\n---\n',
+  eval: '\u3042\u306a\u305f\u306f\u4eba\u4e8b\u8a55\u4fa1\u9762\u8ac7\u306e\u30a2\u30b7\u30b9\u30bf\u30f3\u30c8\u3067\u3059\u3002\u4ee5\u4e0b\u306e\u8a55\u4fa1\u9762\u8ac7\u306e\u4f1a\u8a71\u3092\u8981\u7d04\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u73fe\u5728\u306e\u8a71\u984c\uff1a\uff081\u884c\uff09\n\u25a0 \u8a55\u4fa1\u30dd\u30a4\u30f3\u30c8\uff1a\uff08\u7b87\u6761\u66f8\u304d\uff09\n\u25a0 \u672c\u4eba\u306e\u81ea\u5df1\u8a55\u4fa1\uff1a\uff08\u3042\u308c\u3070\uff09\n\u25a0 \u76ee\u6a19\u30fb\u8ab2\u984c\uff1a\uff08\u3042\u308c\u3070\uff09\n\u3010\u30eb\u30fc\u30eb\u3011\u5ba2\u89b3\u7684\u306b\u3002\u4f1a\u8a71\u306b\u51fa\u3066\u3044\u306a\u3044\u8a71\u984c\u306f\u66f8\u304b\u306a\u3044\u3067\u304f\u3060\u3055\u3044\u3002\n---\n',
+  free: '\u4ee5\u4e0b\u306e\u4f1a\u8a71\u3092\u7c21\u6f54\u306b\u8981\u7d04\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u73fe\u5728\u306e\u8a71\u984c\uff1a\uff081\u884c\uff09\n\u25a0 \u30ad\u30fc\u30dd\u30a4\u30f3\u30c8\uff1a\uff08\u7b87\u6761\u66f8\u304d3\u3064\u4ee5\u5185\uff09\n\u3010\u30eb\u30fc\u30eb\u3011\u4f1a\u8a71\u306b\u51fa\u3066\u3044\u306a\u3044\u8a71\u984c\u306f\u66f8\u304b\u306a\u3044\u3067\u304f\u3060\u3055\u3044\u3002\n---\n'
+};
+
+var ADVICE_PROMPTS = {
+  consul: '\u3042\u306a\u305f\u306f\u969c\u5bb3\u798f\u7949\u30b3\u30f3\u30b5\u30eb\u30bf\u30f3\u30c8\u306e\u30a2\u30b7\u30b9\u30bf\u30f3\u30c8\u3067\u3059\u3002\n\u4ee5\u4e0b\u306f\u30b3\u30f3\u30b5\u30eb\u4e2d\u306e\u4f1a\u8a71\u3067\u3059\u3002\n\u3010\u91cd\u8981\u30eb\u30fc\u30eb\u3011\n- \u4f1a\u8a71\u306e\u4e2d\u3067\u5b9f\u969b\u306b\u8a71\u3055\u308c\u3066\u3044\u308b\u8a71\u984c\u3060\u3051\u306b\u57fa\u3065\u3044\u3066\u63d0\u6848\u3057\u3066\u304f\u3060\u3055\u3044\n- \u4f1a\u8a71\u306b\u51fa\u3066\u3044\u306a\u3044\u8a71\u984c\u3092\u52dd\u624b\u306b\u6301\u3061\u51fa\u3055\u306a\u3044\u3067\u304f\u3060\u3055\u3044\n- \u5404\u63d0\u6848\u306f\u7c21\u6f54\u306b\u30011\u6587\u3067\u66f8\u3044\u3066\u304f\u3060\u3055\u3044\n- 3\u3064\u306e\u63d0\u6848\u3092\u7b87\u6761\u66f8\u304d\u3067\u51fa\u3057\u3066\u304f\u3060\u3055\u3044\n---\n',
+  progress: '\u3042\u306a\u305f\u306f\u969c\u5bb3\u798f\u7949\u30b3\u30f3\u30b5\u30eb\u30bf\u30f3\u30c8\u306e\u30a2\u30b7\u30b9\u30bf\u30f3\u30c8\u3067\u3059\u3002\n\u4ee5\u4e0b\u306f\u4e8b\u696d\u6240\u306e\u9032\u6357\u78ba\u8a8dZoom\u4e2d\u306e\u4f1a\u8a71\u3067\u3059\u3002\n\u3010\u91cd\u8981\u30eb\u30fc\u30eb\u3011\n- \u9032\u6357\u306e\u9045\u308c\u304c\u3042\u308c\u3070\u5177\u4f53\u7684\u306a\u6253\u3061\u624b\u3092\u63d0\u6848\u3057\u3066\u304f\u3060\u3055\u3044\n- \u524d\u56de\u304b\u3089\u306e\u5909\u5316\u3092\u610f\u8b58\u3057\u3066\u6307\u6458\u3057\u3066\u304f\u3060\u3055\u3044\n- \u4f1a\u8a71\u306b\u51fa\u3066\u3044\u306a\u3044\u8a71\u984c\u3092\u52dd\u624b\u306b\u6301\u3061\u51fa\u3055\u306a\u3044\u3067\u304f\u3060\u3055\u3044\n- 3\u3064\u306e\u63d0\u6848\u3092\u7b87\u6761\u66f8\u304d\u3067\u51fa\u3057\u3066\u304f\u3060\u3055\u3044\n---\n',
+  staff: '\u3042\u306a\u305f\u306f\u4eba\u4e8b\u30fb\u52b4\u52d9\u306e\u30a2\u30c9\u30d0\u30a4\u30b6\u30fc\u3067\u3059\u3002\n\u4ee5\u4e0b\u306f\u8077\u54e1\u9762\u8ac7\u4e2d\u306e\u4f1a\u8a71\u3067\u3059\u3002\n\u3010\u91cd\u8981\u30eb\u30fc\u30eb\u3011\n- \u4f1a\u8a71\u3067\u8a71\u3055\u308c\u3066\u3044\u308b\u5185\u5bb9\u306b\u57fa\u3065\u3044\u3066\u30a2\u30c9\u30d0\u30a4\u30b9\u3057\u3066\u304f\u3060\u3055\u3044\n- \u76f8\u624b\u306e\u6c17\u6301\u3061\u306b\u5bc4\u308a\u6dfb\u3044\u3064\u3064\u3001\u5177\u4f53\u7684\u306a\u30a2\u30af\u30b7\u30e7\u30f3\u3092\u63d0\u6848\u3057\u3066\u304f\u3060\u3055\u3044\n- \u96e2\u8077\u9632\u6b62\u30fb\u30e2\u30c1\u30d9\u30fc\u30b7\u30e7\u30f3\u5411\u4e0a\u306e\u89b3\u70b9\u3092\u542b\u3081\u3066\u304f\u3060\u3055\u3044\n- 3\u3064\u306e\u63d0\u6848\u3092\u7b87\u6761\u66f8\u304d\u3067\u51fa\u3057\u3066\u304f\u3060\u3055\u3044\n---\n',
+  user: '\u3042\u306a\u305f\u306f\u969c\u5bb3\u798f\u7949\u306e\u652f\u63f4\u76f8\u8ac7\u54e1\u3067\u3059\u3002\n\u4ee5\u4e0b\u306f\u5229\u7528\u8005\u9762\u8ac7\u4e2d\u306e\u4f1a\u8a71\u3067\u3059\u3002\n\u3010\u91cd\u8981\u30eb\u30fc\u30eb\u3011\n- \u3054\u672c\u4eba\u306e\u767a\u8a00\u3092\u5c0a\u91cd\u3057\u3001\u81ea\u5df1\u6c7a\u5b9a\u3092\u652f\u63f4\u3059\u308b\u8996\u70b9\u3067\u63d0\u6848\u3057\u3066\u304f\u3060\u3055\u3044\n- \u533a\u5206\u5909\u66f4\u3084\u30b5\u30fc\u30d3\u30b9\u5909\u66f4\u306e\u5146\u5019\u304c\u3042\u308c\u3070\u6307\u6458\u3057\u3066\u304f\u3060\u3055\u3044\n- \u4f1a\u8a71\u306b\u51fa\u3066\u3044\u306a\u3044\u8a71\u984c\u3092\u52dd\u624b\u306b\u6301\u3061\u51fa\u3055\u306a\u3044\u3067\u304f\u3060\u3055\u3044\n- 3\u3064\u306e\u63d0\u6848\u3092\u7b87\u6761\u66f8\u304d\u3067\u51fa\u3057\u3066\u304f\u3060\u3055\u3044\n---\n',
+  case: '\u3042\u306a\u305f\u306f\u30b1\u30fc\u30b9\u4f1a\u8b70\u306e\u30d5\u30a1\u30b7\u30ea\u30c6\u30fc\u30bf\u30fc\u3067\u3059\u3002\n\u4ee5\u4e0b\u306f\u30b1\u30fc\u30b9\u4f1a\u8b70\u4e2d\u306e\u4f1a\u8a71\u3067\u3059\u3002\n\u3010\u91cd\u8981\u30eb\u30fc\u30eb\u3011\n- \u307e\u3060\u51fa\u3066\u3044\u306a\u3044\u8996\u70b9\uff08\u770b\u8b77\u30fb\u30ea\u30cf\u30d3\u30ea\u30fb\u5bb6\u65cf\u7b49\uff09\u304c\u3042\u308c\u3070\u6307\u6458\u3057\u3066\u304f\u3060\u3055\u3044\n- \u652f\u63f4\u76ee\u6a19\u3068\u73fe\u72b6\u306e\u30ae\u30e3\u30c3\u30d7\u304c\u3042\u308c\u3070\u6307\u6458\u3057\u3066\u304f\u3060\u3055\u3044\n- \u4f1a\u8a71\u306b\u51fa\u3066\u3044\u306a\u3044\u8a71\u984c\u3092\u52dd\u624b\u306b\u6301\u3061\u51fa\u3055\u306a\u3044\u3067\u304f\u3060\u3055\u3044\n- 3\u3064\u306e\u63d0\u6848\u3092\u7b87\u6761\u66f8\u304d\u3067\u51fa\u3057\u3066\u304f\u3060\u3055\u3044\n---\n',
+  family: '\u3042\u306a\u305f\u306f\u969c\u5bb3\u798f\u7949\u306e\u76f8\u8ac7\u54e1\u3067\u3059\u3002\n\u4ee5\u4e0b\u306f\u3054\u5bb6\u65cf\u3068\u306e\u9762\u8ac7\u4e2d\u306e\u4f1a\u8a71\u3067\u3059\u3002\n\u3010\u91cd\u8981\u30eb\u30fc\u30eb\u3011\n- \u3054\u5bb6\u65cf\u306e\u6c17\u6301\u3061\u306b\u5bc4\u308a\u6dfb\u3063\u305f\u63d0\u6848\u3092\u3057\u3066\u304f\u3060\u3055\u3044\n- \u5236\u5ea6\u306e\u8aac\u660e\u304c\u5fc5\u8981\u306a\u30bf\u30a4\u30df\u30f3\u30b0\u304c\u3042\u308c\u3070\u6559\u3048\u3066\u304f\u3060\u3055\u3044\n- \u5c02\u9580\u7528\u8a9e\u3092\u4f7f\u308f\u305a\u3001\u308f\u304b\u308a\u3084\u3059\u3044\u8a00\u8449\u3067\u63d0\u6848\u3057\u3066\u304f\u3060\u3055\u3044\n- 3\u3064\u306e\u63d0\u6848\u3092\u7b87\u6761\u66f8\u304d\u3067\u51fa\u3057\u3066\u304f\u3060\u3055\u3044\n---\n',
+  eval: '\u3042\u306a\u305f\u306f\u8a55\u4fa1\u9762\u8ac7\u306e\u30d5\u30a1\u30b7\u30ea\u30c6\u30fc\u30bf\u30fc\u3067\u3059\u3002\n\u4ee5\u4e0b\u306f\u8a55\u4fa1\u9762\u8ac7\u4e2d\u306e\u4f1a\u8a71\u3067\u3059\u3002\n\u3010\u91cd\u8981\u30eb\u30fc\u30eb\u3011\n- \u5ba2\u89b3\u7684\u306a\u30c7\u30fc\u30bf\u306b\u57fa\u3065\u304f\u30d5\u30a3\u30fc\u30c9\u30d0\u30c3\u30af\u3092\u63d0\u6848\u3057\u3066\u304f\u3060\u3055\u3044\n- \u81ea\u5df1\u8a55\u4fa1\u3068\u4e0a\u9577\u8a55\u4fa1\u306e\u30ae\u30e3\u30c3\u30d7\u304c\u3042\u308c\u3070\u6307\u6458\u3057\u3066\u304f\u3060\u3055\u3044\n- \u6210\u9577\u3092\u4fc3\u3059\u524d\u5411\u304d\u306a\u63d0\u6848\u3092\u3057\u3066\u304f\u3060\u3055\u3044\n- 3\u3064\u306e\u63d0\u6848\u3092\u7b87\u6761\u66f8\u304d\u3067\u51fa\u3057\u3066\u304f\u3060\u3055\u3044\n---\n',
+  free: '\u3042\u306a\u305f\u306f\u512a\u79c0\u306a\u30a2\u30b7\u30b9\u30bf\u30f3\u30c8\u3067\u3059\u3002\n\u4ee5\u4e0b\u306f\u30e1\u30e2\u3084\u4f1a\u8a71\u306e\u5185\u5bb9\u3067\u3059\u3002\n\u3010\u91cd\u8981\u30eb\u30fc\u30eb\u3011\n- \u5185\u5bb9\u306b\u57fa\u3065\u3044\u3066\u6c17\u3065\u304d\u3084\u30a2\u30c9\u30d0\u30a4\u30b9\u3092\u63d0\u6848\u3057\u3066\u304f\u3060\u3055\u3044\n- \u66f8\u304b\u308c\u3066\u3044\u306a\u3044\u8a71\u984c\u3092\u52dd\u624b\u306b\u6301\u3061\u51fa\u3055\u306a\u3044\u3067\u304f\u3060\u3055\u3044\n- 3\u3064\u306e\u63d0\u6848\u3092\u7b87\u6761\u66f8\u304d\u3067\u51fa\u3057\u3066\u304f\u3060\u3055\u3044\n---\n'
+};
+
+var END_SESSION_PROMPTS = {
+  consul: '\u3042\u306a\u305f\u306f\u969c\u5bb3\u798f\u7949\u30b3\u30f3\u30b5\u30eb\u30bf\u30f3\u30c8\u306e\u30a2\u30b7\u30b9\u30bf\u30f3\u30c8\u3067\u3059\u3002\u30b3\u30f3\u30b5\u30eb\u30bb\u30c3\u30b7\u30e7\u30f3\u304c\u7d42\u4e86\u3057\u307e\u3057\u305f\u3002\n\u4ee5\u4e0b\u306e\u4f1a\u8a71\u5168\u6587\u3068\u8981\u7d04\u3092\u3082\u3068\u306b\u3001\u6700\u7d42\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\u5fc5\u305a\u4ee5\u4e0b\u306e3\u30bb\u30af\u30b7\u30e7\u30f3\u3067\u51fa\u529b\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u25a0 \u30bb\u30c3\u30b7\u30e7\u30f3\u8981\u7d04\n\uff085\u884c\u4ee5\u5185\u3067\u5168\u4f53\u3092\u8981\u7d04\uff09\n\u25a0 \u30a2\u30af\u30b7\u30e7\u30f3\u30d7\u30e9\u30f3\n\uff08\u5177\u4f53\u7684\u306aTODO\u3092\u7b87\u6761\u66f8\u304d\u3067\u3002\u62c5\u5f53\u8005\u30fb\u671f\u9650\u306e\u76ee\u5b89\u3082\uff09\n\u25a0 \u6b21\u56de\u306b\u5411\u3051\u3066\n\uff08\u6b21\u56de\u30b3\u30f3\u30b5\u30eb\u3067\u78ba\u8a8d\u3059\u3079\u304d\u3053\u3068\u30fb\u5bbf\u984c\uff09\n\u3010\u30eb\u30fc\u30eb\u3011\u4f1a\u8a71\u306b\u51fa\u3066\u3044\u306a\u3044\u8a71\u984c\u306f\u542b\u3081\u306a\u3044\u3067\u304f\u3060\u3055\u3044\u3002\n---\n',
+  progress: '\u3042\u306a\u305f\u306f\u969c\u5bb3\u798f\u7949\u30b3\u30f3\u30b5\u30eb\u30bf\u30f3\u30c8\u306e\u30a2\u30b7\u30b9\u30bf\u30f3\u30c8\u3067\u3059\u3002\u9032\u6357\u78ba\u8a8dZoom\u304c\u7d42\u4e86\u3057\u307e\u3057\u305f\u3002\n\u4ee5\u4e0b\u306e\u4f1a\u8a71\u5168\u6587\u3092\u3082\u3068\u306b\u3001\u9032\u6357\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u30bb\u30c3\u30b7\u30e7\u30f3\u8981\u7d04\uff08\u4eca\u56de\u78ba\u8a8d\u3057\u305f\u5185\u5bb95\u884c\u4ee5\u5185\uff09\n\u25a0 \u30a2\u30af\u30b7\u30e7\u30f3\u30d7\u30e9\u30f3\uff08\u6b21\u56de\u307e\u3067\u306b\u3084\u308b\u3053\u3068\u3092\u7b87\u6761\u66f8\u304d\u3067\u3002\u62c5\u5f53\u30fb\u671f\u9650\u3082\uff09\n\u25a0 \u6b21\u56de\u306b\u5411\u3051\u3066\uff08\u6b21\u56de\u78ba\u8a8d\u3059\u3079\u304d\u9805\u76ee\uff09\n---\n',
+  staff: '\u3042\u306a\u305f\u306f\u4eba\u4e8b\u9762\u8ac7\u306e\u30a2\u30b7\u30b9\u30bf\u30f3\u30c8\u3067\u3059\u3002\u8077\u54e1\u9762\u8ac7\u304c\u7d42\u4e86\u3057\u307e\u3057\u305f\u3002\n\u4ee5\u4e0b\u306e\u4f1a\u8a71\u5168\u6587\u3092\u3082\u3068\u306b\u3001\u6700\u7d42\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u30bb\u30c3\u30b7\u30e7\u30f3\u8981\u7d04\uff08\u9762\u8ac7\u306e\u30dd\u30a4\u30f3\u30c85\u884c\u4ee5\u5185\uff09\n\u25a0 \u30a2\u30af\u30b7\u30e7\u30f3\u30d7\u30e9\u30f3\uff08\u30d5\u30a9\u30ed\u30fc\u30a2\u30c3\u30d7\u9805\u76ee\u3092\u7b87\u6761\u66f8\u304d\u3067\uff09\n\u25a0 \u6b21\u56de\u306b\u5411\u3051\u3066\uff08\u6b21\u56de\u9762\u8ac7\u3067\u78ba\u8a8d\u3059\u3079\u304d\u3053\u3068\uff09\n---\n',
+  user: '\u3042\u306a\u305f\u306f\u969c\u5bb3\u798f\u7949\u306e\u652f\u63f4\u76f8\u8ac7\u54e1\u3067\u3059\u3002\u5229\u7528\u8005\u9762\u8ac7\u304c\u7d42\u4e86\u3057\u307e\u3057\u305f\u3002\n\u4ee5\u4e0b\u306e\u4f1a\u8a71\u5168\u6587\u3092\u3082\u3068\u306b\u3001\u6700\u7d42\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u30bb\u30c3\u30b7\u30e7\u30f3\u8981\u7d04\uff08\u3054\u672c\u4eba\u306e\u5e0c\u671b\u30fb\u30cb\u30fc\u30ba\u4e2d\u5fc3\u306b5\u884c\u4ee5\u5185\uff09\n\u25a0 \u30a2\u30af\u30b7\u30e7\u30f3\u30d7\u30e9\u30f3\uff08\u652f\u63f4\u30c1\u30fc\u30e0\u306eTODO\u3092\u7b87\u6761\u66f8\u304d\u3067\uff09\n\u25a0 \u6b21\u56de\u306b\u5411\u3051\u3066\uff08\u6b21\u56de\u9762\u8ac7\u3067\u78ba\u8a8d\u3059\u3079\u304d\u3053\u3068\uff09\n---\n',
+  case: '\u3042\u306a\u305f\u306f\u30b1\u30fc\u30b9\u4f1a\u8b70\u306e\u66f8\u8a18\u3067\u3059\u3002\u4f1a\u8b70\u304c\u7d42\u4e86\u3057\u307e\u3057\u305f\u3002\n\u4ee5\u4e0b\u306e\u4f1a\u8b70\u306e\u4f1a\u8a71\u5168\u6587\u3092\u3082\u3068\u306b\u3001\u6700\u7d42\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u30bb\u30c3\u30b7\u30e7\u30f3\u8981\u7d04\uff08\u6c7a\u5b9a\u4e8b\u9805\u30fb\u8b70\u8ad6\u306e\u30dd\u30a4\u30f3\u30c85\u884c\u4ee5\u5185\uff09\n\u25a0 \u30a2\u30af\u30b7\u30e7\u30f3\u30d7\u30e9\u30f3\uff08\u62c5\u5f53\u8005\u5225\u306eTODO\u3092\u7b87\u6761\u66f8\u304d\u3067\uff09\n\u25a0 \u6b21\u56de\u306b\u5411\u3051\u3066\uff08\u7d99\u7d9a\u691c\u8a0e\u4e8b\u9805\u30fb\u6b21\u56de\u8b70\u984c\u6848\uff09\n---\n',
+  family: '\u3042\u306a\u305f\u306f\u969c\u5bb3\u798f\u7949\u306e\u76f8\u8ac7\u54e1\u3067\u3059\u3002\u3054\u5bb6\u65cf\u3068\u306e\u9762\u8ac7\u304c\u7d42\u4e86\u3057\u307e\u3057\u305f\u3002\n\u4ee5\u4e0b\u306e\u4f1a\u8a71\u5168\u6587\u3092\u3082\u3068\u306b\u3001\u6700\u7d42\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u30bb\u30c3\u30b7\u30e7\u30f3\u8981\u7d04\uff08\u3054\u5bb6\u65cf\u306e\u601d\u3044\u30fb\u8981\u671b\u4e2d\u5fc3\u306b5\u884c\u4ee5\u5185\uff09\n\u25a0 \u30a2\u30af\u30b7\u30e7\u30f3\u30d7\u30e9\u30f3\uff08\u4e8b\u696d\u6240\u306eTODO\u3092\u7b87\u6761\u66f8\u304d\u3067\uff09\n\u25a0 \u6b21\u56de\u306b\u5411\u3051\u3066\uff08\u6b21\u56de\u78ba\u8a8d\u3059\u3079\u304d\u3053\u3068\uff09\n---\n',
+  eval: '\u3042\u306a\u305f\u306f\u8a55\u4fa1\u9762\u8ac7\u306e\u30a2\u30b7\u30b9\u30bf\u30f3\u30c8\u3067\u3059\u3002\u8a55\u4fa1\u9762\u8ac7\u304c\u7d42\u4e86\u3057\u307e\u3057\u305f\u3002\n\u4ee5\u4e0b\u306e\u9762\u8ac7\u306e\u4f1a\u8a71\u5168\u6587\u3092\u3082\u3068\u306b\u3001\u6700\u7d42\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u30bb\u30c3\u30b7\u30e7\u30f3\u8981\u7d04\uff08\u8a55\u4fa1\u30dd\u30a4\u30f3\u30c8\u30fb\u5408\u610f\u4e8b\u98055\u884c\u4ee5\u5185\uff09\n\u25a0 \u30a2\u30af\u30b7\u30e7\u30f3\u30d7\u30e9\u30f3\uff08\u76ee\u6a19\u9054\u6210\u306b\u5411\u3051\u305fTODO\uff09\n\u25a0 \u6b21\u56de\u306b\u5411\u3051\u3066\uff08\u6b21\u56de\u8a55\u4fa1\u3067\u78ba\u8a8d\u3059\u3079\u304d\u3053\u3068\uff09\n---\n',
+  free: '\u4ee5\u4e0b\u306e\u4f1a\u8a71\u304c\u7d42\u4e86\u3057\u307e\u3057\u305f\u3002\u6700\u7d42\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n\u3010\u51fa\u529b\u5f62\u5f0f\u3011\n\u25a0 \u30bb\u30c3\u30b7\u30e7\u30f3\u8981\u7d04\uff085\u884c\u4ee5\u5185\uff09\n\u25a0 \u30a2\u30af\u30b7\u30e7\u30f3\u30d7\u30e9\u30f3\uff08TODO\u304c\u3042\u308c\u3070\u7b87\u6761\u66f8\u304d\u3067\uff09\n\u25a0 \u6b21\u56de\u306b\u5411\u3051\u3066\uff08\u30d5\u30a9\u30ed\u30fc\u4e8b\u9805\u304c\u3042\u308c\u3070\uff09\n---\n'
+};
+
+// ============================================================
+// Default Layouts per Mode
+// ============================================================
+var DEFAULT_LAYOUTS = {
+  consul:   { panels: [true, true, true, true] },
+  progress: { panels: [true, true, true, true] },
+  staff:    { panels: [true, false, true, true] },
+  user:     { panels: [true, true, true, false] },
+  case:     { panels: [true, true, true, false] },
+  family:   { panels: [true, false, true, true] },
+  eval:     { panels: [true, true, true, false] },
+  free:     { panels: [true, false, false, true] }
+};
+
 // ============================================================
 // State
 // ============================================================
@@ -299,18 +391,22 @@ var adviceCards = [];
 var adviceCount = 0;
 var sentenceSinceLastSummary = 0;
 var lastSummaryTime = 0;
-var currentMode = 'dashboard'; // dashboard, recording, result
-var dashFilterCorp = null;     // null = all, string = specific corp
+var currentMode = 'dashboard';
+var dashFilterCorp = null;
 var currentActionPlan = [];
 var aiMinutesText = '';
 var currentResultTab = 'all';
-var dashCheckedKeys = [];      // checked session keys on dashboard
+var dashCheckedKeys = [];
+var selectedModeId = 'consul';
+var panelVisible = [true, true, true, true];
+var endReportText = '';
+var currentSessionKey = null; // for resume
 
 // ============================================================
 // Claude API
 // ============================================================
 function getApiKey() {
-  var k = localStorage.getItem('dripro_claude_api_key') || '';
+  var k = localStorage.getItem('dripro_claude_api_key') || localStorage.getItem('consul_live_api_key') || '';
   return k.replace(/"/g, '').trim();
 }
 
@@ -352,6 +448,134 @@ async function callClaude(prompt, maxTokens) {
 }
 
 // ============================================================
+// Mode Selector
+// ============================================================
+function getSelectedMode() {
+  for (var i = 0; i < LIVE_MODES.length; i++) {
+    if (LIVE_MODES[i].id === selectedModeId) return LIVE_MODES[i];
+  }
+  return LIVE_MODES[0];
+}
+
+function toggleModeDropdown() {
+  var dd = document.getElementById('modeDropdown');
+  if (dd.style.display === 'block') {
+    dd.style.display = 'none';
+    return;
+  }
+  var html = '';
+  LIVE_MODES.forEach(function(m) {
+    var isActive = m.id === selectedModeId;
+    html += '<div onclick="selectMode(\'' + m.id + '\')" style="padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;'
+      + (isActive ? 'background:#F0F4F8;' : '')
+      + '" onmouseover="this.style.background=\'#F7FAFC\'" onmouseout="this.style.background=\'' + (isActive ? '#F0F4F8' : '#fff') + '\'">'
+      + '<span style="font-size:18px;width:28px;text-align:center;">' + m.icon + '</span>'
+      + '<div><div style="font-size:13px;font-weight:600;color:#1A365D;">' + m.label + '</div>'
+      + '<div style="font-size:11px;color:#718096;">' + m.desc + '</div></div>'
+      + (isActive ? '<span style="margin-left:auto;color:' + m.color + ';font-weight:700;">&#10003;</span>' : '')
+      + '</div>';
+  });
+  dd.innerHTML = html;
+  dd.style.display = 'block';
+}
+
+function selectMode(modeId) {
+  selectedModeId = modeId;
+  var m = getSelectedMode();
+  document.getElementById('modeSelectorIcon').textContent = m.icon;
+  document.getElementById('modeSelectorLabel').textContent = m.label;
+  document.getElementById('modeDropdown').style.display = 'none';
+  updateModeBadge();
+  // Apply default layout for this mode
+  if (DEFAULT_LAYOUTS[modeId]) {
+    panelVisible = DEFAULT_LAYOUTS[modeId].panels.slice();
+    applyPanelLayout();
+  }
+}
+
+function updateModeBadge() {
+  var m = getSelectedMode();
+  var badge = document.getElementById('currentModeBadge');
+  if (badge) {
+    badge.style.background = m.color;
+    badge.innerHTML = m.icon + ' ' + m.label;
+  }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  var sel = document.getElementById('modeSelector');
+  if (sel && !sel.contains(e.target)) {
+    document.getElementById('modeDropdown').style.display = 'none';
+  }
+});
+
+// ============================================================
+// Panel Layout
+// ============================================================
+function togglePanel(idx) {
+  panelVisible[idx] = !panelVisible[idx];
+  // Ensure at least one panel is visible
+  var anyVisible = panelVisible.some(function(v) { return v; });
+  if (!anyVisible) { panelVisible[idx] = true; }
+  applyPanelLayout();
+}
+
+function setPanelPreset(preset) {
+  if (preset === '4') panelVisible = [true, true, true, true];
+  else if (preset === '3') panelVisible = [true, true, false, true];
+  else if (preset === '2') panelVisible = [true, false, false, true];
+  else if (preset === '1') panelVisible = [true, false, false, false];
+  applyPanelLayout();
+}
+
+function applyPanelLayout() {
+  var visibleCount = panelVisible.filter(function(v) { return v; }).length;
+  var pct = visibleCount > 0 ? (100 / visibleCount) : 100;
+
+  for (var i = 0; i < 4; i++) {
+    var panel = document.getElementById('panel' + i);
+    if (panel) {
+      panel.style.display = panelVisible[i] ? 'flex' : 'none';
+      panel.style.width = panelVisible[i] ? pct + '%' : '0';
+    }
+  }
+
+  // Update toggle buttons
+  var toggleColors = [
+    { border: '#8EC7C4', bgOn: '#F0FFF4', bgOff: '#fff', colorOn: '#276749', colorOff: '#A0AEC0' },
+    { border: '#F7B759', bgOn: '#FFFFF0', bgOff: '#fff', colorOn: '#975A16', colorOff: '#A0AEC0' },
+    { border: '#64748b', bgOn: '#F8FAFC', bgOff: '#fff', colorOn: '#475569', colorOff: '#A0AEC0' },
+    { border: '#1A365D', bgOn: '#EBF8FF', bgOff: '#fff', colorOn: '#1A365D', colorOff: '#A0AEC0' }
+  ];
+  for (var j = 0; j < 4; j++) {
+    var btn = document.getElementById('toggleP' + j);
+    if (btn) {
+      var tc = toggleColors[j];
+      var on = panelVisible[j];
+      btn.style.borderColor = on ? tc.border : '#E2E8F0';
+      btn.style.background = on ? tc.bgOn : tc.bgOff;
+      btn.style.color = on ? tc.colorOn : tc.colorOff;
+      btn.style.fontWeight = on ? '600' : '400';
+    }
+  }
+
+  // Update preset buttons
+  var presets = document.querySelectorAll('.preset-btn');
+  var currentPreset = '';
+  if (panelVisible[0] && panelVisible[1] && panelVisible[2] && panelVisible[3]) currentPreset = '4';
+  else if (panelVisible[0] && panelVisible[1] && !panelVisible[2] && panelVisible[3]) currentPreset = '3';
+  else if (panelVisible[0] && !panelVisible[1] && !panelVisible[2] && panelVisible[3]) currentPreset = '2';
+  else if (panelVisible[0] && !panelVisible[1] && !panelVisible[2] && !panelVisible[3]) currentPreset = '1';
+  presets.forEach(function(pb) {
+    var isActive = pb.getAttribute('data-preset') === currentPreset;
+    pb.style.background = isActive ? '#1A365D' : '#fff';
+    pb.style.color = isActive ? '#fff' : '#4A5568';
+    pb.style.borderColor = isActive ? '#1A365D' : '#E2E8F0';
+  });
+}
+
+// ============================================================
 // Settings Modal
 // ============================================================
 function openSettings() {
@@ -364,9 +588,7 @@ function openSettings() {
   updateApiKeyStatus();
 }
 
-function closeSettings() {
-  document.getElementById('settingsModal').style.display = 'none';
-}
+function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
 
 function toggleApiKeyVisibility() {
   var inp = document.getElementById('apiKeyInput');
@@ -377,8 +599,10 @@ function saveApiKey() {
   var val = document.getElementById('apiKeyInput').value.trim();
   if (val) {
     localStorage.setItem('dripro_claude_api_key', val);
+    localStorage.setItem('consul_live_api_key', val);
   } else {
     localStorage.removeItem('dripro_claude_api_key');
+    localStorage.removeItem('consul_live_api_key');
   }
   updateApiKeyStatus();
   updateApiBanner();
@@ -389,43 +613,24 @@ function saveApiKey() {
 async function testApiKey() {
   var status = document.getElementById('apiKeyStatus');
   var val = document.getElementById('apiKeyInput').value.trim();
-  if (!val) {
-    status.innerHTML = '<span style="color:#E53E3E;">APIキーを入力してください</span>';
-    return;
-  }
+  if (!val) { status.innerHTML = '<span style="color:#E53E3E;">APIキーを入力してください</span>'; return; }
   status.innerHTML = '<span style="color:#718096;">接続テスト中...</span>';
   try {
     var res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': val,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 10,
-        messages: [{ role: 'user', content: 'test' }]
-      })
+      headers: { 'Content-Type': 'application/json', 'x-api-key': val, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 10, messages: [{ role: 'user', content: 'test' }] })
     });
-    if (res.ok) {
-      status.innerHTML = '<span style="color:#38A169;font-weight:500;">&#10003; 接続成功</span>';
-    } else {
-      status.innerHTML = '<span style="color:#E53E3E;">&#10007; 接続失敗 (HTTP ' + res.status + ')</span>';
-    }
-  } catch (e) {
-    status.innerHTML = '<span style="color:#E53E3E;">&#10007; 接続エラー: ' + e.message + '</span>';
-  }
+    if (res.ok) { status.innerHTML = '<span style="color:#38A169;font-weight:500;">&#10003; 接続成功</span>'; }
+    else { status.innerHTML = '<span style="color:#E53E3E;">&#10007; 接続失敗 (HTTP ' + res.status + ')</span>'; }
+  } catch (e) { status.innerHTML = '<span style="color:#E53E3E;">&#10007; 接続エラー: ' + e.message + '</span>'; }
 }
 
 function updateApiKeyStatus() {
   var status = document.getElementById('apiKeyStatus');
-  if (hasApiKey()) {
-    status.innerHTML = '<span style="color:#38A169;">&#10003; APIキー設定済み</span>';
-  } else {
-    status.innerHTML = '<span style="color:#718096;">APIキー未設定（モックモードで動作します）</span>';
-  }
+  status.innerHTML = hasApiKey()
+    ? '<span style="color:#38A169;">&#10003; APIキー設定済み</span>'
+    : '<span style="color:#718096;">APIキー未設定（モックモードで動作します）</span>';
 }
 
 function updateApiBanner() {
@@ -437,83 +642,62 @@ function updateApiBanner() {
       + '<button onclick="openSettings()" style="margin-left:auto;background:#F7B759;color:#1A365D;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">設定する</button>'
       + '</div>';
   } else {
-    banner.innerHTML = '<div style="padding:10px 20px;background:#F0FFF4;border:1px solid #9AE6B4;border-radius:8px;font-size:13px;color:#276749;">'
-      + '&#10003; Claude API 接続済み &#8212; AI要約・アドバイスが有効です'
-      + '</div>';
+    banner.innerHTML = '<div style="padding:10px 20px;background:#F0FFF4;border:1px solid #9AE6B4;border-radius:8px;font-size:13px;color:#276749;">&#10003; Claude API 接続済み</div>';
   }
 }
 
 function updateAiBadges() {
   var mode = hasApiKey() ? 'AI' : 'MOCK';
-  var color = hasApiKey() ? '#38A169' : '#A0AEC0';
-  var summaryBadge = document.getElementById('summaryAiBadge');
-  var adviceBadge = document.getElementById('adviceAiBadge');
-  if (summaryBadge) summaryBadge.textContent = mode;
-  if (adviceBadge) adviceBadge.textContent = mode;
+  var el1 = document.getElementById('summaryAiBadge');
+  var el2 = document.getElementById('adviceAiBadge');
+  if (el1) el1.textContent = mode;
+  if (el2) el2.textContent = mode;
 }
 
 // ============================================================
-// AI Analysis Modal
+// AI Analysis & Question Modals
 // ============================================================
 function openAiAnalysisModal(title, content) {
   document.getElementById('aiAnalysisTitle').textContent = title;
   document.getElementById('aiAnalysisContent').textContent = content;
   document.getElementById('aiAnalysisModal').style.display = 'flex';
 }
-
-function closeAiAnalysisModal() {
-  document.getElementById('aiAnalysisModal').style.display = 'none';
-}
-
+function closeAiAnalysisModal() { document.getElementById('aiAnalysisModal').style.display = 'none'; }
 function copyAiAnalysis() {
   var text = document.getElementById('aiAnalysisContent').textContent;
   var btn = document.getElementById('btnCopyAnalysis');
-  navigator.clipboard.writeText(text).then(function() {
-    btnFeedback(btn, '&#10003; コピーしました', '#38A169', '&#128203; コピー', '#1A365D');
-  });
+  navigator.clipboard.writeText(text).then(function() { btnFeedback(btn, '&#10003; コピー済', '#38A169', '&#128203; コピー', '#1A365D'); });
 }
 
-// AI Question Modal
 function openAiQuestionModal() {
   document.getElementById('aiQuestionInput').value = '';
   document.getElementById('aiQuestionAnswer').textContent = '';
   document.getElementById('aiQuestionModal').style.display = 'flex';
   setTimeout(function(){ document.getElementById('aiQuestionInput').focus(); }, 100);
 }
-
-function closeAiQuestionModal() {
-  document.getElementById('aiQuestionModal').style.display = 'none';
-}
+function closeAiQuestionModal() { document.getElementById('aiQuestionModal').style.display = 'none'; }
 
 async function submitAiQuestion() {
   var question = document.getElementById('aiQuestionInput').value.trim();
   if (!question) return;
   var answerEl = document.getElementById('aiQuestionAnswer');
   var btn = document.getElementById('btnSubmitQuestion');
-  btn.disabled = true;
-  btn.textContent = '回答中...';
+  btn.disabled = true; btn.textContent = '回答中...';
   answerEl.textContent = '回答を生成しています...';
-
-  // Gather transcript from checked sessions
   var sessions = listSavedSessions();
   var checkedSessions = sessions.filter(function(s) { return dashCheckedKeys.indexOf(s._key) >= 0; });
   var allText = checkedSessions.map(function(s) {
     var lines = (s.sentences || []).map(function(se) { return se.text; }).join('\n');
     return '【' + (s.corpName || '-') + ' ' + new Date(s.date).toLocaleDateString('ja-JP') + '】\n' + lines;
   }).join('\n\n');
-
   var result = null;
   if (hasApiKey()) {
-    var prompt = '以下は複数回のコンサル議事録の文字起こしです。ユーザーの質問に丁寧に回答してください。\n\n質問: ' + question + '\n\n議事録データ:\n' + allText;
+    var prompt = '以下は複数回の議事録の文字起こしです。ユーザーの質問に丁寧に回答してください。\n\n質問: ' + question + '\n\n議事録データ:\n' + allText;
     result = await callClaude(prompt, 1500);
   }
-  if (!result) {
-    result = '(モックモード) 選択された ' + checkedSessions.length + ' 件の議事録について: ' + question + '\n\nClaude APIキーを設定すると、AIが議事録を分析して回答します。';
-  }
-
+  if (!result) { result = '(モックモード) 選択された ' + checkedSessions.length + ' 件の議事録について: ' + question + '\n\nClaude APIキーを設定すると、AIが議事録を分析して回答します。'; }
   answerEl.textContent = result;
-  btn.disabled = false;
-  btn.textContent = '送信';
+  btn.disabled = false; btn.textContent = '送信';
 }
 
 // ============================================================
@@ -526,20 +710,14 @@ function formatTime(ms) {
   var sec = String(s % 60).padStart(2, '0');
   return h + ':' + m + ':' + sec;
 }
-
 function getElapsed() {
   if (!startTime) return 0;
   if (isPaused) return pausedElapsed;
   return pausedElapsed + (Date.now() - startTime);
 }
-
-function updateTimer() {
-  document.getElementById('timerDisplay').textContent = formatTime(getElapsed());
-}
-
+function updateTimer() { document.getElementById('timerDisplay').textContent = formatTime(getElapsed()); }
 function getTimestamp() {
-  var ms = getElapsed();
-  var s = Math.floor(ms / 1000);
+  var ms = getElapsed(); var s = Math.floor(ms / 1000);
   var m = String(Math.floor(s / 60)).padStart(2, '0');
   var sec = String(s % 60).padStart(2, '0');
   return m + ':' + sec;
@@ -550,80 +728,48 @@ function getTimestamp() {
 // ============================================================
 function initRecognition() {
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) {
-    alert('このブラウザは音声認識に対応していません。Chromeをお使いください。');
-    return null;
-  }
+  if (!SR) { alert('このブラウザは音声認識に対応していません。Chromeをお使いください。'); return null; }
   var r = new SR();
-  r.lang = 'ja-JP';
-  r.continuous = true;
-  r.interimResults = true;
-  r.maxAlternatives = 1;
-
+  r.lang = 'ja-JP'; r.continuous = true; r.interimResults = true; r.maxAlternatives = 1;
   r.onresult = function(e) {
     var newInterim = '';
     for (var i = e.resultIndex; i < e.results.length; i++) {
       var transcript = e.results[i][0].transcript;
       if (e.results[i].isFinal) {
         var trimmed = transcript.trim();
-        // Fix #4: Only count non-empty text as a valid sentence
         if (trimmed.length > 0) {
           var entry = { text: trimmed, timestamp: getTimestamp() };
           sentences.push(entry);
           sentenceSinceLastSummary++;
-          // Fix #1: Immediately append to DOM for real-time accumulation
           appendSentenceToDOM(entry);
           checkSummaryTrigger();
         }
-      } else {
-        newInterim = transcript;
-      }
+      } else { newInterim = transcript; }
     }
     interimText = newInterim;
-    // Update only the interim display element
     updateInterimDisplay();
   };
-
   r.onerror = function(e) {
     console.warn('Speech error:', e.error);
-    if (e.error === 'not-allowed') {
-      alert('マイクの使用が許可されていません。ブラウザの設定でマイクを許可してください。');
-      stopSession();
-    }
+    if (e.error === 'not-allowed') { alert('マイクの使用が許可されていません。'); stopSession(); }
   };
-
-  r.onend = function() {
-    if (isRecording && !isPaused) {
-      try { r.start(); } catch(_) {}
-    }
-  };
-
+  r.onend = function() { if (isRecording && !isPaused) { try { r.start(); } catch(_) {} } };
   return r;
 }
 
 // ============================================================
-// Render Transcript — Fix #1: Real-time DOM accumulation
+// Transcript Rendering
 // ============================================================
 function appendSentenceToDOM(entry) {
   var area = document.getElementById('transcriptArea');
-  // Remove placeholder if present
   var placeholder = area.querySelector('[data-placeholder]');
   if (placeholder) placeholder.remove();
-
   var div = document.createElement('div');
   div.style.cssText = 'margin-bottom:8px;animation:fadeIn 0.3s;';
-  div.innerHTML = '<span style="color:#8EC7C4;font-size:12px;font-weight:500;margin-right:8px;">' + entry.timestamp + '</span>'
-    + '<span>' + escHtml(entry.text) + '</span>';
-  // Insert before interim element if it exists
+  div.innerHTML = '<span style="color:#8EC7C4;font-size:11px;font-weight:500;margin-right:8px;">' + entry.timestamp + '</span><span>' + escHtml(entry.text) + '</span>';
   var interimEl = area.querySelector('[data-interim]');
-  if (interimEl) {
-    area.insertBefore(div, interimEl);
-  } else {
-    area.appendChild(div);
-  }
-  // Auto-scroll to bottom
+  if (interimEl) area.insertBefore(div, interimEl); else area.appendChild(div);
   area.scrollTop = area.scrollHeight;
-  // Update count
   document.getElementById('sentenceCount').textContent = sentences.length + ' 発言';
 }
 
@@ -631,55 +777,32 @@ function updateInterimDisplay() {
   var area = document.getElementById('transcriptArea');
   var interimEl = area.querySelector('[data-interim]');
   if (interimText) {
-    if (!interimEl) {
-      interimEl = document.createElement('div');
-      interimEl.setAttribute('data-interim', 'true');
-      interimEl.style.cssText = 'color:#A0AEC0;font-style:italic;margin-bottom:8px;';
-      area.appendChild(interimEl);
-    }
-    interimEl.innerHTML = '<span style="font-size:12px;margin-right:8px;">' + getTimestamp() + '</span>' + escHtml(interimText);
+    if (!interimEl) { interimEl = document.createElement('div'); interimEl.setAttribute('data-interim', 'true'); interimEl.style.cssText = 'color:#A0AEC0;font-style:italic;margin-bottom:8px;'; area.appendChild(interimEl); }
+    interimEl.innerHTML = '<span style="font-size:11px;margin-right:8px;">' + getTimestamp() + '</span>' + escHtml(interimText);
     area.scrollTop = area.scrollHeight;
-  } else {
-    if (interimEl) interimEl.remove();
-  }
+  } else { if (interimEl) interimEl.remove(); }
 }
 
-// Full re-render (used only on session start for initial state)
 function renderTranscript() {
   var area = document.getElementById('transcriptArea');
   var html = '';
   sentences.forEach(function(s) {
-    html += '<div style="margin-bottom:8px;animation:fadeIn 0.3s;">'
-      + '<span style="color:#8EC7C4;font-size:12px;font-weight:500;margin-right:8px;">' + s.timestamp + '</span>'
-      + '<span>' + escHtml(s.text) + '</span>'
-      + '</div>';
+    html += '<div style="margin-bottom:8px;animation:fadeIn 0.3s;"><span style="color:#8EC7C4;font-size:11px;font-weight:500;margin-right:8px;">' + s.timestamp + '</span><span>' + escHtml(s.text) + '</span></div>';
   });
-  if (interimText) {
-    html += '<div data-interim="true" style="color:#A0AEC0;font-style:italic;margin-bottom:8px;">'
-      + '<span style="font-size:12px;margin-right:8px;">' + getTimestamp() + '</span>'
-      + escHtml(interimText)
-      + '</div>';
-  }
-  if (sentences.length === 0 && !interimText) {
-    html = '<div data-placeholder style="color:#A0AEC0;text-align:center;padding:40px 0;">音声を認識しています...</div>';
-  }
+  if (sentences.length === 0 && !interimText) html = '<div data-placeholder style="color:#A0AEC0;text-align:center;padding:40px 0;">音声を認識しています...</div>';
   area.innerHTML = html;
   area.scrollTop = area.scrollHeight;
   document.getElementById('sentenceCount').textContent = sentences.length + ' 発言';
 }
 
-function escHtml(t) {
-  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function escHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ============================================================
-// Summary (Claude API + fallback mock)
+// Summary
 // ============================================================
 function checkSummaryTrigger() {
   var now = Date.now();
-  if (sentenceSinceLastSummary >= 5 || (now - lastSummaryTime > 30000 && sentenceSinceLastSummary > 0)) {
-    triggerSummary();
-  }
+  if (sentenceSinceLastSummary >= 5 || (now - lastSummaryTime > 30000 && sentenceSinceLastSummary > 0)) triggerSummary();
 }
 
 function triggerSummary() {
@@ -688,64 +811,43 @@ function triggerSummary() {
   sentenceSinceLastSummary = 0;
   lastSummaryTime = Date.now();
   summaryCount++;
-
-  var block = {
-    id: summaryCount,
-    timestamp: getTimestamp(),
-    text: text,
-    summary: null
-  };
+  var block = { id: summaryCount, timestamp: getTimestamp(), text: text, summary: null };
   summaryQueue.unshift(block);
   renderSummary();
-
-  generateSummary(text).then(function(result) {
-    block.summary = result;
-    renderSummary();
-  });
+  generateSummary(text).then(function(result) { block.summary = result; renderSummary(); });
 }
 
 async function generateSummary(text) {
-  // Try Claude API first
   if (hasApiKey()) {
-    var prompt = '以下のコンサル会話を箇条書き3〜5個で要約してください。各項目にトピック名も付けてください。\n\n' + text;
+    var prompt = (SUMMARY_PROMPTS[selectedModeId] || SUMMARY_PROMPTS.free) + text;
     var result = await callClaude(prompt, 500);
     if (result) return result;
   }
-  // Fallback mock
   await new Promise(function(r){ setTimeout(r, 1500); });
   var lines = text.split('\n').filter(function(l){ return l.trim(); });
   if (lines.length === 0) return '(発言なし)';
   var mock = '';
-  lines.forEach(function(l, i) {
-    if (i < 3) mock += '- ' + l.substring(0, 40) + (l.length > 40 ? '...' : '') + '\n';
-  });
+  lines.forEach(function(l, i) { if (i < 3) mock += '- ' + l.substring(0, 40) + (l.length > 40 ? '...' : '') + '\n'; });
   if (lines.length > 3) mock += '- ほか ' + (lines.length - 3) + ' 件の発言';
   return mock;
 }
 
 function renderSummary() {
   var area = document.getElementById('summaryArea');
-  if (summaryQueue.length === 0) {
-    area.innerHTML = '<div style="color:#A0AEC0;text-align:center;padding:40px 0;">発言が蓄積されると要約を生成します</div>';
-    return;
-  }
+  if (summaryQueue.length === 0) { area.innerHTML = '<div style="color:#A0AEC0;text-align:center;padding:40px 0;">発言が蓄積されると要約を生成します</div>'; return; }
   var html = '';
   summaryQueue.forEach(function(b) {
-    html += '<div style="margin-bottom:16px;padding:14px;background:#FFFFF0;border:1px solid #F7B759;border-radius:8px;animation:fadeIn 0.3s;">'
-      + '<div style="font-size:12px;color:#975A16;font-weight:500;margin-bottom:6px;">'
-      + '&#9632; トピック #' + b.id + '  <span style="color:#A0AEC0;">' + b.timestamp + '</span></div>';
-    if (b.summary === null) {
-      html += '<div style="color:#A0AEC0;font-style:italic;">要約を生成中...</div>';
-    } else {
-      html += '<pre style="white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.7;color:#2D3748;margin:0;">' + escHtml(b.summary) + '</pre>';
-    }
+    html += '<div style="margin-bottom:14px;padding:12px;background:#FFFFF0;border:1px solid #F7B759;border-radius:8px;animation:fadeIn 0.3s;">'
+      + '<div style="font-size:11px;color:#975A16;font-weight:500;margin-bottom:4px;">&#9632; #' + b.id + '  <span style="color:#A0AEC0;">' + b.timestamp + '</span></div>';
+    if (b.summary === null) html += '<div style="color:#A0AEC0;font-style:italic;">要約を生成中...</div>';
+    else html += '<pre style="white-space:pre-wrap;font-family:inherit;font-size:12px;line-height:1.6;color:#2D3748;margin:0;">' + escHtml(b.summary) + '</pre>';
     html += '</div>';
   });
   area.innerHTML = html;
 }
 
 // ============================================================
-// AI Advice (Claude API + fallback mock)
+// AI Advice
 // ============================================================
 function startAdviceLoop() {
   adviceInterval = setInterval(function() {
@@ -760,59 +862,25 @@ function startAdviceLoop() {
   }, 30000);
 }
 
-function getCorpName() {
-  return document.getElementById('corpNameInput').value || '(未入力)';
-}
-
-function getSessionMode() {
-  return document.getElementById('sessionMode').value || 'general';
-}
-
-function getModePrompt(mode, corpName) {
-  var prompts = {
-    consul: 'あなたは障害福祉グループホームのコンサルAIコーチです。\n事業所「' + corpName + '」のコンサル中です。\n\n【重要ルール】\n- 実際に話されている内容だけに基づいてアドバイスすること\n- 話題に出ていないこと（加算・入居率等）を勝手に持ち出さないこと\n- 会話の流れを読んで、今のタイミングで有用な一言を提案すること',
-    meeting: 'あなたは会議のファシリテーション支援AIです。\n「' + corpName + '」の会議中です。\n\n【重要ルール】\n- 議論が脱線していたら指摘する\n- 決定事項が曖昧なら明確化を促す\n- 発言が偏っていたら他の参加者の意見を求めることを提案する',
-    training: 'あなたは研修・セミナーの学習支援AIです。\n「' + corpName + '」の研修中です。\n\n【重要ルール】\n- 重要なポイントを強調する\n- 実務への活かし方を提案する\n- 質問すべきポイントがあれば指摘する',
-    interview: 'あなたは面談・1on1の対話支援AIです。\n「' + corpName + '」の面談中です。\n\n【重要ルール】\n- 相手の気持ちに寄り添った質問を提案する\n- 深掘りすべきポイントを指摘する\n- ポジティブなフィードバックのタイミングを教える',
-    general: 'あなたは会話分析AIアシスタントです。\n「' + corpName + '」のセッション中です。\n\n【重要ルール】\n- 話されている内容に基づいてのみコメントすること\n- 話題に出ていないことを勝手に持ち出さないこと\n- 会話の要点や気づきを提供すること'
-  };
-  return prompts[mode] || prompts.general;
-}
+function getCorpName() { return document.getElementById('corpNameInput').value || '(未入力)'; }
 
 async function generateAdvice(text, corpName) {
-  var mode = getSessionMode();
-  // Try Claude API first
   if (hasApiKey()) {
-    var systemPrompt = getModePrompt(mode, corpName);
-    var prompt = systemPrompt + '\n\n以下の直近の会話を分析して、1つだけアドバイスをJSON形式で返してください。\n話されている内容に直接関係することだけを言ってください。\nJSONのみ返してください。\n{"type":"point|check|good|alert","title":"短いタイトル（10文字以内）","body":"3行以内のアドバイス"}\n\n会話:\n' + text;
+    var basePrompt = (ADVICE_PROMPTS[selectedModeId] || ADVICE_PROMPTS.free);
+    var prompt = basePrompt + '\n\n以下の直近の会話を分析して、1つだけアドバイスをJSON形式で返してください。\nJSONのみ返してください。\n{"type":"point|check|good|alert","title":"短いタイトル（10文字以内）","body":"3行以内のアドバイス"}\n\n会話:\n' + text;
     var result = await callClaude(prompt, 300);
     if (result) {
       try {
         var jsonMatch = result.match(/\{[\s\S]*?\}/);
         if (jsonMatch) {
           var parsed = JSON.parse(jsonMatch[0]);
-          var typeMap = {
-            point: { icon: '\uD83D\uDCA1', color: '#3182CE' },
-            check: { icon: '\u26A0', color: '#DD6B20' },
-            good:  { icon: '\uD83D\uDC4D', color: '#38A169' },
-            alert: { icon: '\uD83D\uDEA8', color: '#E53E3E' }
-          };
+          var typeMap = { point: { icon: '\uD83D\uDCA1', color: '#3182CE' }, check: { icon: '\u26A0', color: '#DD6B20' }, good: { icon: '\uD83D\uDC4D', color: '#38A169' }, alert: { icon: '\uD83D\uDEA8', color: '#E53E3E' } };
           var tm = typeMap[parsed.type] || typeMap.point;
-          return {
-            type: parsed.type,
-            icon: tm.icon,
-            title: parsed.title,
-            color: tm.color,
-            body: parsed.body,
-            time: getTimestamp()
-          };
+          return { type: parsed.type, icon: tm.icon, title: parsed.title, color: tm.color, body: parsed.body, time: getTimestamp() };
         }
-      } catch (e) {
-        console.warn('Advice JSON parse error:', e);
-      }
+      } catch (e) { console.warn('Advice JSON parse error:', e); }
     }
   }
-  // Fallback mock — 会話内容に基づくモック
   await new Promise(function(r){ setTimeout(r, 1000); });
   var types = [
     { type: 'point', icon: '\uD83D\uDCA1', title: 'ポイント', color: '#3182CE' },
@@ -821,50 +889,43 @@ async function generateAdvice(text, corpName) {
     { type: 'alert', icon: '\uD83D\uDEA8', title: '要注意', color: '#E53E3E' }
   ];
   var pick = types[adviceCount % types.length];
-  // 会話内容からキーワードを拾ってモックを生成
-  var words = text.replace(/\n/g, ' ');
-  var mockBody = '';
-  if (words.length < 10) {
-    mockBody = '（モックモード）APIキーを設定するとAIが会話を分析します。';
-  } else {
-    var firstTopic = sentences.length > 0 ? sentences[sentences.length-1].text.substring(0, 20) : '';
-    var mockOptions = [
-      '「' + firstTopic + '...」について、もう少し具体的に掘り下げてみましょう。',
-      '今の話題の要点を確認するタイミングです。',
-      '良い流れです。この調子で具体的な話に進めましょう。',
-      '今の内容について、次のアクションを明確にしておきましょう。'
-    ];
-    mockBody = mockOptions[adviceCount % mockOptions.length] + '\n（モックモード）';
-  }
-  return {
-    type: pick.type,
-    icon: pick.icon,
-    title: pick.title,
-    color: pick.color,
-    body: mockBody,
-    time: getTimestamp()
-  };
+  var firstTopic = sentences.length > 0 ? sentences[sentences.length-1].text.substring(0, 20) : '';
+  var mockOptions = [
+    '「' + firstTopic + '...」について、もう少し具体的に掘り下げてみましょう。',
+    '今の話題の要点を確認するタイミングです。',
+    '良い流れです。この調子で具体的な話に進めましょう。',
+    '今の内容について、次のアクションを明確にしておきましょう。'
+  ];
+  return { type: pick.type, icon: pick.icon, title: pick.title, color: pick.color, body: mockOptions[adviceCount % mockOptions.length] + '\n（モックモード）', time: getTimestamp() };
 }
 
 function renderAdvice() {
   var area = document.getElementById('adviceArea');
-  if (adviceCards.length === 0) {
-    area.innerHTML = '<div style="color:#A0AEC0;text-align:center;padding:40px 0;">AIがコンサル内容を分析します</div>';
-    return;
-  }
+  if (adviceCards.length === 0) { area.innerHTML = '<div style="color:#A0AEC0;text-align:center;padding:40px 0;">AIがコンサル内容を分析します</div>'; return; }
   var html = '';
   adviceCards.forEach(function(c) {
-    html += '<div style="margin-bottom:12px;padding:14px;background:#fff;border-left:4px solid ' + c.color + ';border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.08);animation:fadeIn 0.3s;">'
-      + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">'
-      + '<span style="font-size:16px;">' + c.icon + '</span>'
-      + '<span style="font-weight:700;font-size:13px;color:' + c.color + ';">' + c.title + '</span>'
-      + '<span style="margin-left:auto;font-size:11px;color:#A0AEC0;">' + c.time + '</span>'
-      + '</div>'
-      + '<div style="font-size:13px;color:#4A5568;line-height:1.6;">' + escHtml(c.body) + '</div>'
-      + '</div>';
+    html += '<div style="margin-bottom:10px;padding:12px;background:#fff;border-left:4px solid ' + c.color + ';border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.08);animation:fadeIn 0.3s;">'
+      + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">'
+      + '<span style="font-size:14px;">' + c.icon + '</span>'
+      + '<span style="font-weight:700;font-size:12px;color:' + c.color + ';">' + c.title + '</span>'
+      + '<span style="margin-left:auto;font-size:10px;color:#A0AEC0;">' + c.time + '</span>'
+      + '</div><div style="font-size:12px;color:#4A5568;line-height:1.6;">' + escHtml(c.body) + '</div></div>';
   });
   area.innerHTML = html;
 }
+
+// ============================================================
+// Memo auto-save
+// ============================================================
+function saveMemo() {
+  var memo = document.getElementById('memoArea');
+  if (memo && currentSessionKey) {
+    localStorage.setItem('consul_live_memo_' + currentSessionKey, memo.value);
+  }
+}
+
+// Auto-save memo every 5 seconds
+setInterval(function() { if (isRecording) saveMemo(); }, 5000);
 
 // ============================================================
 // Session Control
@@ -875,27 +936,47 @@ function startFromDashboard() {
   currentMode = 'waiting';
 }
 
-function startSession() {
+function startSession(resumeData) {
   recognition = initRecognition();
   if (!recognition) return;
 
   isRecording = true;
   isPaused = false;
-  sentences = [];
+
+  if (resumeData) {
+    sentences = resumeData.sentences || [];
+    summaryQueue = (resumeData.summaries || []).map(function(s) { return { id: s.id, timestamp: s.timestamp, summary: s.summary, text: '' }; });
+    summaryCount = summaryQueue.length;
+    adviceCards = resumeData.adviceCards || [];
+    adviceCount = adviceCards.length;
+    pausedElapsed = resumeData.durationMs || 0;
+    document.getElementById('corpNameInput').value = resumeData.corpName || '';
+    if (resumeData.modeId) { selectedModeId = resumeData.modeId; selectMode(resumeData.modeId); }
+    currentSessionKey = resumeData._key || ('resume_' + Date.now());
+    // Load memo
+    var savedMemo = localStorage.getItem('consul_live_memo_' + currentSessionKey) || resumeData.memo || '';
+    setTimeout(function() { document.getElementById('memoArea').value = savedMemo; }, 100);
+  } else {
+    sentences = [];
+    summaryQueue = [];
+    summaryCount = 0;
+    adviceCards = [];
+    adviceCount = 0;
+    pausedElapsed = 0;
+    currentSessionKey = 'session_' + Date.now();
+  }
+
   interimText = '';
-  summaryQueue = [];
-  summaryCount = 0;
-  adviceCards = [];
-  adviceCount = 0;
   sentenceSinceLastSummary = 0;
   lastSummaryTime = Date.now();
-  pausedElapsed = 0;
   startTime = Date.now();
   currentActionPlan = [];
   aiMinutesText = '';
+  endReportText = '';
 
   hideAllScreens();
   document.getElementById('mainColumns').style.display = 'block';
+  document.getElementById('panelToggleBar').style.display = 'flex';
   document.getElementById('btnStart').style.display = 'none';
   document.getElementById('btnDashboard').style.display = 'none';
   document.getElementById('btnPause').style.display = 'inline-block';
@@ -904,15 +985,18 @@ function startSession() {
   document.getElementById('corpNameInput').disabled = true;
   currentMode = 'recording';
 
+  // Apply mode default layout
+  if (!resumeData && DEFAULT_LAYOUTS[selectedModeId]) {
+    panelVisible = DEFAULT_LAYOUTS[selectedModeId].panels.slice();
+  }
+  applyPanelLayout();
+  updateModeBadge();
+
   timerInterval = setInterval(updateTimer, 200);
   startAdviceLoop();
   updateAiBadges();
 
-  try {
-    recognition.start();
-  } catch(e) {
-    console.error('Recognition start error:', e);
-  }
+  try { recognition.start(); } catch(e) { console.error('Recognition start error:', e); }
 
   renderTranscript();
   renderSummary();
@@ -922,15 +1006,13 @@ function startSession() {
 function togglePause() {
   if (!isRecording) return;
   if (isPaused) {
-    isPaused = false;
-    startTime = Date.now();
+    isPaused = false; startTime = Date.now();
     document.getElementById('btnPause').textContent = '一時停止';
     document.getElementById('btnPause').style.background = '#DD6B20';
     document.getElementById('micIndicator').style.display = 'inline-block';
     try { recognition.start(); } catch(_) {}
   } else {
-    isPaused = true;
-    pausedElapsed += (Date.now() - startTime);
+    isPaused = true; pausedElapsed += (Date.now() - startTime);
     document.getElementById('btnPause').textContent = '再開';
     document.getElementById('btnPause').style.background = '#38A169';
     document.getElementById('micIndicator').style.display = 'none';
@@ -939,17 +1021,14 @@ function togglePause() {
 }
 
 function stopSession() {
-  if (!confirm('コンサルを終了しますか？')) return;
-
+  if (!confirm('セッションを終了しますか？')) return;
   isRecording = false;
-  if (!isPaused && startTime) {
-    pausedElapsed += (Date.now() - startTime);
-  }
+  if (!isPaused && startTime) pausedElapsed += (Date.now() - startTime);
   isPaused = false;
-
   clearInterval(timerInterval);
   clearInterval(adviceInterval);
   try { recognition.stop(); } catch(_) {}
+  saveMemo();
 
   document.getElementById('btnStart').style.display = 'inline-block';
   document.getElementById('btnDashboard').style.display = 'inline-block';
@@ -957,6 +1036,7 @@ function stopSession() {
   document.getElementById('btnStop').style.display = 'none';
   document.getElementById('micIndicator').style.display = 'none';
   document.getElementById('corpNameInput').disabled = false;
+  document.getElementById('panelToggleBar').style.display = 'none';
 
   showResult();
 }
@@ -965,22 +1045,17 @@ function hideAllScreens() {
   document.getElementById('waitingScreen').style.display = 'none';
   document.getElementById('dashboardScreen').style.display = 'none';
   document.getElementById('mainColumns').style.display = 'none';
+  document.getElementById('panelToggleBar').style.display = 'none';
   document.getElementById('resultScreen').style.display = 'none';
 }
 
 // ============================================================
-// Button Feedback Helper
+// Button Feedback
 // ============================================================
 function btnFeedback(btn, successHtml, successBg, originalHtml, originalBg) {
   var origBg = btn.style.background;
-  btn.innerHTML = successHtml;
-  btn.style.background = successBg;
-  btn.disabled = true;
-  setTimeout(function() {
-    btn.innerHTML = originalHtml;
-    btn.style.background = originalBg || origBg;
-    btn.disabled = false;
-  }, 2000);
+  btn.innerHTML = successHtml; btn.style.background = successBg; btn.disabled = true;
+  setTimeout(function() { btn.innerHTML = originalHtml; btn.style.background = originalBg || origBg; btn.disabled = false; }, 2000);
 }
 
 // ============================================================
@@ -989,8 +1064,8 @@ function btnFeedback(btn, successHtml, successBg, originalHtml, originalBg) {
 function showResult() {
   hideAllScreens();
   document.getElementById('resultScreen').style.display = 'block';
-  document.getElementById('aiMinutesSection').style.display = 'none';
-  document.getElementById('actionPlanSection').style.display = 'none';
+  document.getElementById('endSessionReport').style.display = 'none';
+  document.getElementById('endReportLoading').style.display = 'none';
   currentMode = 'result';
   currentResultTab = 'all';
 
@@ -999,28 +1074,122 @@ function showResult() {
   var duration = formatTime(pausedElapsed);
   var now = new Date();
   var dateStr = now.getFullYear() + '/' + String(now.getMonth()+1).padStart(2,'0') + '/' + String(now.getDate()).padStart(2,'0');
+  var m = getSelectedMode();
 
   meta.innerHTML =
+    '<div style="padding:8px 16px;background:' + m.color + '22;border-radius:6px;font-size:13px;"><strong>' + m.icon + '</strong> ' + m.label + '</div>' +
     '<div style="padding:8px 16px;background:#EBF8FF;border-radius:6px;font-size:13px;"><strong>事業所:</strong> ' + escHtml(corpName) + '</div>' +
     '<div style="padding:8px 16px;background:#F0FFF4;border-radius:6px;font-size:13px;"><strong>所要時間:</strong> ' + duration + '</div>' +
     '<div style="padding:8px 16px;background:#FFFFF0;border-radius:6px;font-size:13px;"><strong>発言数:</strong> ' + sentences.length + '</div>' +
     '<div style="padding:8px 16px;background:#FFF5F5;border-radius:6px;font-size:13px;"><strong>日付:</strong> ' + dateStr + '</div>';
 
-  var transcript = sentences.map(function(s) {
-    return '[' + s.timestamp + '] ' + s.text;
-  }).join('\n');
+  var transcript = sentences.map(function(s) { return '[' + s.timestamp + '] ' + s.text; }).join('\n');
   document.getElementById('resultTranscript').textContent = transcript;
 
-  // Enable/disable AI buttons
-  document.getElementById('btnGenMinutes').style.opacity = (sentences.length > 0) ? '1' : '0.5';
-  document.getElementById('btnGenActions').style.opacity = (sentences.length > 0) ? '1' : '0.5';
+  // Show memo in result
+  var memoText = document.getElementById('memoArea') ? document.getElementById('memoArea').value : '';
+  if (!memoText) memoText = localStorage.getItem('consul_live_memo_' + currentSessionKey) || '';
+  document.getElementById('resultMemo').textContent = memoText || '(メモなし)';
 
-  // Reset tabs
   switchResultTab('all');
+
+  // Auto-generate end session report
+  if (sentences.length > 0) generateEndSessionReport();
 }
 
 // ============================================================
-// Result Tab Switching — Fix #5
+// End Session Report
+// ============================================================
+async function generateEndSessionReport() {
+  document.getElementById('endReportLoading').style.display = 'block';
+  var fullText = sentences.map(function(s) { return '[' + s.timestamp + '] ' + s.text; }).join('\n');
+  var summaryText = summaryQueue.map(function(b) { return b.summary || ''; }).filter(function(t) { return t; }).join('\n');
+  var corpName = getCorpName();
+
+  var result = null;
+  if (hasApiKey()) {
+    var prompt = (END_SESSION_PROMPTS[selectedModeId] || END_SESSION_PROMPTS.free)
+      + '\n事業所名: ' + corpName
+      + '\n\n--- 要約 ---\n' + summaryText
+      + '\n\n--- 会話全文 ---\n' + fullText;
+    result = await callClaude(prompt, 2000);
+  }
+
+  if (!result) {
+    result = '\u25a0 \u30bb\u30c3\u30b7\u30e7\u30f3\u8981\u7d04\n'
+      + corpName + ' とのセッション（' + sentences.length + '発言、' + formatTime(pausedElapsed) + '）\n'
+      + '（AIレポートを利用するにはClaude APIキーを設定してください）\n\n'
+      + '\u25a0 \u30a2\u30af\u30b7\u30e7\u30f3\u30d7\u30e9\u30f3\n- Claude APIキーを設定してください\n\n'
+      + '\u25a0 \u6b21\u56de\u306b\u5411\u3051\u3066\n- AIが自動生成します';
+  }
+
+  endReportText = result;
+  document.getElementById('endReportLoading').style.display = 'none';
+
+  // Parse and display the 3 sections
+  var sections = parseEndReport(result);
+  var summaryEl = document.getElementById('endReportSummary');
+  var actionsEl = document.getElementById('endReportActions');
+  var nextEl = document.getElementById('endReportNext');
+
+  summaryEl.innerHTML = '<div style="background:#F0FFF4;border:1px solid #9AE6B4;border-radius:8px;padding:14px;margin-bottom:4px;">'
+    + '<h4 style="font-size:13px;font-weight:700;color:#276749;margin-bottom:8px;">\u25a0 セッション要約</h4>'
+    + '<pre style="white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.7;color:#2D3748;margin:0;">' + escHtml(sections.summary) + '</pre></div>';
+
+  var actionHtml = '<div style="background:#FFFFF0;border:1px solid #F7B759;border-radius:8px;padding:14px;margin-bottom:4px;">'
+    + '<h4 style="font-size:13px;font-weight:700;color:#975A16;margin-bottom:8px;">\u25a0 アクションプラン</h4>';
+  var actionItems = extractActionItems(sections.actions);
+  if (actionItems.length > 0) {
+    actionItems.forEach(function(item, idx) {
+      actionHtml += '<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;">'
+        + '<input type="checkbox" id="endAction' + idx + '" style="margin-top:3px;width:16px;height:16px;cursor:pointer;flex-shrink:0;" />'
+        + '<label for="endAction' + idx + '" style="font-size:13px;line-height:1.6;color:#2D3748;cursor:pointer;">' + escHtml(item) + '</label></div>';
+    });
+  } else {
+    actionHtml += '<pre style="white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.7;color:#2D3748;margin:0;">' + escHtml(sections.actions) + '</pre>';
+  }
+  actionHtml += '</div>';
+  actionsEl.innerHTML = actionHtml;
+
+  nextEl.innerHTML = '<div style="background:#EBF8FF;border:1px solid #BEE3F8;border-radius:8px;padding:14px;">'
+    + '<h4 style="font-size:13px;font-weight:700;color:#2B6CB0;margin-bottom:8px;">\u25a0 次回に向けて</h4>'
+    + '<pre style="white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.7;color:#2D3748;margin:0;">' + escHtml(sections.next) + '</pre></div>';
+
+  document.getElementById('endSessionReport').style.display = 'block';
+}
+
+function parseEndReport(text) {
+  var summary = '', actions = '', next = '';
+  var parts = text.split(/\u25a0\s*/);
+  parts.forEach(function(p) {
+    var t = p.trim();
+    if (t.match(/^セッション要約/)) summary = t.replace(/^セッション要約\s*\n?/, '').trim();
+    else if (t.match(/^アクションプラン/)) actions = t.replace(/^アクションプラン\s*\n?/, '').trim();
+    else if (t.match(/^次回に向けて/)) next = t.replace(/^次回に向けて\s*\n?/, '').trim();
+  });
+  if (!summary && !actions && !next) summary = text;
+  return { summary: summary, actions: actions, next: next };
+}
+
+function extractActionItems(text) {
+  var items = [];
+  var lines = text.split('\n');
+  lines.forEach(function(line) {
+    var trimmed = line.replace(/^[\s\-\*\u2022\u25CB\u25CF\d\.]+\s*/, '').trim();
+    if (trimmed.length > 2) items.push(trimmed);
+  });
+  return items;
+}
+
+function copyEndReport() {
+  var btn = document.getElementById('btnCopyEndReport');
+  navigator.clipboard.writeText(endReportText).then(function() {
+    btnFeedback(btn, '&#10003; コピー済', '#38A169', 'コピー', '#EBF8FF');
+  });
+}
+
+// ============================================================
+// Result Tab Switching
 // ============================================================
 function switchResultTab(tab) {
   currentResultTab = tab;
@@ -1031,202 +1200,40 @@ function switchResultTab(tab) {
     t.style.color = isActive ? '#1A365D' : '#718096';
     t.style.borderBottomColor = isActive ? '#1A365D' : 'transparent';
   });
-
-  var minutesSec = document.getElementById('aiMinutesSection');
-  var actionsSec = document.getElementById('actionPlanSection');
+  var memoSec = document.getElementById('memoSection');
   var transcriptSec = document.getElementById('transcriptSection');
-
-  // Show/hide based on tab
   if (tab === 'all') {
-    // Show all that have content
-    if (aiMinutesText) minutesSec.style.display = 'block';
-    if (currentActionPlan.length > 0) actionsSec.style.display = 'block';
+    memoSec.style.display = 'block';
     transcriptSec.style.display = 'block';
   } else if (tab === 'transcript') {
-    minutesSec.style.display = 'none';
-    actionsSec.style.display = 'none';
+    memoSec.style.display = 'none';
     transcriptSec.style.display = 'block';
-  } else if (tab === 'minutes') {
-    minutesSec.style.display = aiMinutesText ? 'block' : 'none';
-    actionsSec.style.display = 'none';
-    transcriptSec.style.display = 'none';
-  } else if (tab === 'actions') {
-    minutesSec.style.display = 'none';
-    actionsSec.style.display = currentActionPlan.length > 0 ? 'block' : 'none';
+  } else if (tab === 'memo') {
+    memoSec.style.display = 'block';
     transcriptSec.style.display = 'none';
   }
 }
 
-async function generateMinutes() {
-  if (sentences.length === 0) return;
-  var btn = document.getElementById('btnGenMinutes');
-  btn.disabled = true;
-  btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px;"></span> 生成中...';
-
-  var fullText = sentences.map(function(s) { return '[' + s.timestamp + '] ' + s.text; }).join('\n');
-  var corpName = getCorpName();
-
-  var result = null;
-  if (hasApiKey()) {
-    var prompt = '以下は「' + corpName + '」とのコンサル会話の文字起こしです。これを議事録形式にまとめてください。\n\n'
-      + '出力形式:\n'
-      + '1. 日時・事業所名\n'
-      + '2. 議題（話されたトピックを箇条書き）\n'
-      + '3. 各トピックの要点\n'
-      + '4. 決定事項\n'
-      + '5. 次回までのアクション\n\n'
-      + '文字起こし:\n' + fullText;
-    result = await callClaude(prompt, 1500);
-  }
-
-  if (!result) {
-    // Mock fallback
-    var topics = sentences.slice(0, 5).map(function(s) { return '- ' + s.text.substring(0, 50); }).join('\n');
-    result = '【議事録】\n\n'
-      + '日時: ' + new Date().toLocaleString('ja-JP') + '\n'
-      + '事業所: ' + corpName + '\n\n'
-      + '--- 議題 ---\n' + topics + '\n\n'
-      + '--- 決定事項 ---\n- (AI議事録を利用するにはClaude APIキーを設定してください)\n\n'
-      + '--- 次回アクション ---\n- (Claude APIで自動生成されます)\n';
-  }
-
-  aiMinutesText = result;
-  document.getElementById('aiMinutesContent').textContent = result;
-  document.getElementById('aiMinutesSection').style.display = 'block';
-  btn.disabled = false;
-  btn.innerHTML = '&#129302; AI議事録を生成';
-
-  // Update tab visibility
-  switchResultTab(currentResultTab);
-}
-
-function copyMinutes() {
-  var btn = document.getElementById('btnCopyMinutes');
-  navigator.clipboard.writeText(aiMinutesText).then(function() {
-    btnFeedback(btn, '&#10003; コピーしました', '#38A169', 'コピー', '#EBF8FF');
-  });
-}
-
-async function generateActionPlan() {
-  if (sentences.length === 0) return;
-  var btn = document.getElementById('btnGenActions');
-  btn.disabled = true;
-  btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px;"></span> 抽出中...';
-
-  var fullText = sentences.map(function(s) { return s.text; }).join('\n');
-  var corpName = getCorpName();
-  var items = [];
-
-  if (hasApiKey()) {
-    var prompt = '以下は「' + corpName + '」とのコンサル会話です。会話からアクションプラン（やるべきこと）を3〜7個抽出してJSON配列で返してください。JSONのみ返してください。\n'
-      + '[{"task":"タスク内容","priority":"high|medium|low"}]\n\n会話:\n' + fullText;
-    var result = await callClaude(prompt, 800);
-    if (result) {
-      try {
-        var jsonMatch = result.match(/\[[\s\S]*?\]/);
-        if (jsonMatch) {
-          items = JSON.parse(jsonMatch[0]);
-        }
-      } catch (e) {
-        console.warn('Action plan parse error:', e);
-      }
-    }
-  }
-
-  if (items.length === 0) {
-    // Mock
-    items = [
-      { task: '加算取得状況の確認', priority: 'high' },
-      { task: '入居率の改善施策を検討', priority: 'medium' },
-      { task: '次回コンサルの日程調整', priority: 'low' }
-    ];
-  }
-
-  currentActionPlan = items.map(function(item, idx) {
-    return { id: idx, task: item.task, priority: item.priority || 'medium', assignee: '', deadline: '', done: false };
-  });
-
-  renderActionPlan();
-  document.getElementById('actionPlanSection').style.display = 'block';
-  btn.disabled = false;
-  btn.innerHTML = '&#127919; アクションプランを抽出';
-
-  // Update tab visibility
-  switchResultTab(currentResultTab);
-}
-
-function renderActionPlan() {
-  var container = document.getElementById('actionPlanContent');
-  var prioColors = { high: '#E53E3E', medium: '#DD6B20', low: '#38A169' };
-  var prioLabels = { high: '高', medium: '中', low: '低' };
-
-  var html = '<table style="width:100%;border-collapse:collapse;font-size:13px;">'
-    + '<thead><tr style="background:#F7FAFC;border-bottom:2px solid #E2E8F0;">'
-    + '<th style="padding:10px;text-align:left;width:40px;"></th>'
-    + '<th style="padding:10px;text-align:left;">タスク</th>'
-    + '<th style="padding:10px;text-align:center;width:60px;">優先度</th>'
-    + '<th style="padding:10px;text-align:left;width:140px;">担当者</th>'
-    + '<th style="padding:10px;text-align:left;width:140px;">期限</th>'
-    + '</tr></thead><tbody>';
-
-  currentActionPlan.forEach(function(item) {
-    var pColor = prioColors[item.priority] || '#718096';
-    var pLabel = prioLabels[item.priority] || '-';
-    html += '<tr style="border-bottom:1px solid #E2E8F0;' + (item.done ? 'opacity:0.5;' : '') + '">'
-      + '<td style="padding:10px;text-align:center;">'
-      + '<input type="checkbox" ' + (item.done ? 'checked' : '') + ' onchange="toggleActionDone(' + item.id + ')" style="width:16px;height:16px;cursor:pointer;" />'
-      + '</td>'
-      + '<td style="padding:10px;' + (item.done ? 'text-decoration:line-through;' : '') + '">' + escHtml(item.task) + '</td>'
-      + '<td style="padding:10px;text-align:center;"><span style="background:' + pColor + ';color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">' + pLabel + '</span></td>'
-      + '<td style="padding:10px;"><input type="text" value="' + escHtml(item.assignee) + '" onchange="updateAction(' + item.id + ',\'assignee\',this.value)" placeholder="担当者名" style="width:100%;padding:4px 8px;border:1px solid #E2E8F0;border-radius:4px;font-size:12px;font-family:inherit;" /></td>'
-      + '<td style="padding:10px;"><input type="date" value="' + escHtml(item.deadline) + '" onchange="updateAction(' + item.id + ',\'deadline\',this.value)" style="width:100%;padding:4px 8px;border:1px solid #E2E8F0;border-radius:4px;font-size:12px;font-family:inherit;" /></td>'
-      + '</tr>';
-  });
-
-  html += '</tbody></table>';
-  container.innerHTML = html;
-}
-
-function toggleActionDone(id) {
-  currentActionPlan.forEach(function(item) {
-    if (item.id === id) item.done = !item.done;
-  });
-  renderActionPlan();
-}
-
-function updateAction(id, field, value) {
-  currentActionPlan.forEach(function(item) {
-    if (item.id === id) item[field] = value;
-  });
-}
-
-// Fix #3: Copy with feedback
 function copyTranscript() {
   var text = document.getElementById('resultTranscript').textContent;
   var btn = document.getElementById('btnCopyTranscript');
   navigator.clipboard.writeText(text).then(function() {
-    btnFeedback(btn, '&#10003; コピーしました', '#38A169', '&#128203; コピー', '#1A365D');
+    btnFeedback(btn, '&#10003; コピー済', '#38A169', '&#128203; コピー', '#1A365D');
   }).catch(function() {
-    var ta = document.createElement('textarea');
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    btnFeedback(btn, '&#10003; コピーしました', '#38A169', '&#128203; コピー', '#1A365D');
+    var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    btnFeedback(btn, '&#10003; コピー済', '#38A169', '&#128203; コピー', '#1A365D');
   });
 }
 
-// Fix #3: Save with feedback
 function saveSession() {
   var btn = document.getElementById('btnSaveSession');
-  btn.disabled = true;
-  btn.innerHTML = '保存中...';
-  btn.style.background = '#A0AEC0';
-
+  btn.disabled = true; btn.innerHTML = '保存中...'; btn.style.background = '#A0AEC0';
   var key = 'dripro_consul_session_' + Date.now();
+  var memoText = document.getElementById('memoArea') ? document.getElementById('memoArea').value : '';
+  if (!memoText) memoText = localStorage.getItem('consul_live_memo_' + currentSessionKey) || '';
   var data = {
     corpName: getCorpName(),
+    modeId: selectedModeId,
     date: new Date().toISOString(),
     duration: formatTime(pausedElapsed),
     durationMs: pausedElapsed,
@@ -1234,23 +1241,17 @@ function saveSession() {
     sentences: sentences,
     summaries: summaryQueue.map(function(b) { return { id: b.id, timestamp: b.timestamp, summary: b.summary }; }),
     adviceCards: adviceCards,
-    aiMinutes: aiMinutesText || '',
+    memo: memoText,
+    endReport: endReportText || '',
     actionPlan: currentActionPlan || []
   };
   try {
     localStorage.setItem(key, JSON.stringify(data));
-    btn.innerHTML = '&#10003; 保存しました';
-    btn.style.background = '#38A169';
-    setTimeout(function() {
-      btn.innerHTML = '&#128190; 議事録を保存';
-      btn.style.background = '#38A169';
-      btn.disabled = false;
-    }, 2000);
+    btn.innerHTML = '&#10003; 保存しました'; btn.style.background = '#38A169';
+    setTimeout(function() { btn.innerHTML = '&#128190; 議事録を保存'; btn.style.background = '#38A169'; btn.disabled = false; }, 2000);
   } catch(e) {
     alert('保存に失敗しました: ' + e.message);
-    btn.innerHTML = '&#128190; 議事録を保存';
-    btn.style.background = '#38A169';
-    btn.disabled = false;
+    btn.innerHTML = '&#128190; 議事録を保存'; btn.style.background = '#38A169'; btn.disabled = false;
   }
 }
 
@@ -1269,7 +1270,6 @@ function showDashboard() {
   document.getElementById('timerDisplay').textContent = '00:00:00';
   currentMode = 'dashboard';
   dashCheckedKeys = [];
-
   updateApiBanner();
   renderDashboard();
 }
@@ -1279,14 +1279,15 @@ function listSavedSessions() {
   for (var i = 0; i < localStorage.length; i++) {
     var key = localStorage.key(i);
     if (key && key.startsWith('dripro_consul_session_')) {
-      try {
-        var d = JSON.parse(localStorage.getItem(key));
-        d._key = key;
-        sessions.push(d);
-      } catch(_) {}
+      try { var d = JSON.parse(localStorage.getItem(key)); d._key = key; sessions.push(d); } catch(_) {}
     }
   }
   return sessions.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+}
+
+function getModeById(id) {
+  for (var i = 0; i < LIVE_MODES.length; i++) { if (LIVE_MODES[i].id === id) return LIVE_MODES[i]; }
+  return null;
 }
 
 function renderDashboard() {
@@ -1295,39 +1296,29 @@ function renderDashboard() {
   // KPI Cards
   var totalSessions = sessions.length;
   var now = new Date();
-  var thisMonth = sessions.filter(function(s) {
-    var d = new Date(s.date);
-    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-  }).length;
+  var thisMonth = sessions.filter(function(s) { var d = new Date(s.date); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth(); }).length;
   var totalSentences = sessions.reduce(function(sum, s) { return sum + (s.sentenceCount || 0); }, 0);
-  var avgDuration = totalSessions > 0
-    ? formatTime(sessions.reduce(function(sum, s) { return sum + (s.durationMs || 0); }, 0) / totalSessions)
-    : '00:00:00';
+  var avgDuration = totalSessions > 0 ? formatTime(sessions.reduce(function(sum, s) { return sum + (s.durationMs || 0); }, 0) / totalSessions) : '00:00:00';
 
-  var kpiHtml = '';
   var kpis = [
-    { label: '総コンサル数', value: totalSessions, icon: '&#128202;', color: '#3182CE', bg: '#EBF8FF' },
-    { label: '今月のコンサル', value: thisMonth, icon: '&#128197;', color: '#38A169', bg: '#F0FFF4' },
+    { label: '総セッション数', value: totalSessions, icon: '&#128202;', color: '#3182CE', bg: '#EBF8FF' },
+    { label: '今月', value: thisMonth, icon: '&#128197;', color: '#38A169', bg: '#F0FFF4' },
     { label: '総発言数', value: totalSentences.toLocaleString(), icon: '&#128172;', color: '#DD6B20', bg: '#FFFAF0' },
     { label: '平均所要時間', value: avgDuration, icon: '&#9200;', color: '#805AD5', bg: '#FAF5FF' }
   ];
+  var kpiHtml = '';
   kpis.forEach(function(k) {
     kpiHtml += '<div style="background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">'
       + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'
       + '<span style="font-size:12px;color:#718096;font-weight:500;">' + k.label + '</span>'
       + '<span style="width:32px;height:32px;border-radius:8px;background:' + k.bg + ';display:flex;align-items:center;justify-content:center;font-size:16px;">' + k.icon + '</span>'
-      + '</div>'
-      + '<div style="font-size:28px;font-weight:700;color:' + k.color + ';">' + k.value + '</div>'
-      + '</div>';
+      + '</div><div style="font-size:28px;font-weight:700;color:' + k.color + ';">' + k.value + '</div></div>';
   });
   document.getElementById('kpiCards').innerHTML = kpiHtml;
 
   // Corp Filter
   var corpNames = [];
-  sessions.forEach(function(s) {
-    if (s.corpName && corpNames.indexOf(s.corpName) === -1) corpNames.push(s.corpName);
-  });
-
+  sessions.forEach(function(s) { if (s.corpName && corpNames.indexOf(s.corpName) === -1) corpNames.push(s.corpName); });
   var filterHtml = '<button onclick="setDashFilter(null)" style="padding:6px 16px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border:1px solid ' + (dashFilterCorp === null ? '#1A365D' : '#E2E8F0') + ';background:' + (dashFilterCorp === null ? '#1A365D' : '#fff') + ';color:' + (dashFilterCorp === null ? '#fff' : '#4A5568') + ';">すべて</button>';
   corpNames.forEach(function(cn) {
     var active = dashFilterCorp === cn;
@@ -1343,18 +1334,19 @@ function renderDashboard() {
     document.getElementById('corpDetailPanel').style.display = 'none';
   }
 
-  // Session List with checkboxes — Fix #6
+  // Session List
   var filtered = dashFilterCorp ? sessions.filter(function(s) { return s.corpName === dashFilterCorp; }) : sessions;
   var listHtml = '';
   if (filtered.length === 0) {
-    listHtml = '<div style="padding:40px;text-align:center;color:#A0AEC0;">保存済みのコンサルはありません</div>';
+    listHtml = '<div style="padding:40px;text-align:center;color:#A0AEC0;">保存済みのセッションはありません</div>';
   } else {
     listHtml = '<table style="width:100%;border-collapse:collapse;font-size:13px;">'
       + '<thead><tr style="background:#F7FAFC;border-bottom:2px solid #E2E8F0;">'
       + '<th style="padding:12px 8px;text-align:center;width:40px;"><input type="checkbox" onchange="toggleAllDashChecks(this.checked)" style="width:16px;height:16px;cursor:pointer;" /></th>'
       + '<th style="padding:12px 16px;text-align:left;">日付</th>'
+      + '<th style="padding:12px 16px;text-align:left;">モード</th>'
       + '<th style="padding:12px 16px;text-align:left;">事業所名</th>'
-      + '<th style="padding:12px 16px;text-align:center;">所要時間</th>'
+      + '<th style="padding:12px 16px;text-align:center;">時間</th>'
       + '<th style="padding:12px 16px;text-align:center;">発言数</th>'
       + '<th style="padding:12px 16px;text-align:right;">アクション</th>'
       + '</tr></thead><tbody>';
@@ -1362,100 +1354,93 @@ function renderDashboard() {
     filtered.forEach(function(s, idx) {
       var d = new Date(s.date);
       var dateStr = d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-      var rowId = 'row_' + idx;
       var detailId = 'detail_' + idx;
       var isChecked = dashCheckedKeys.indexOf(s._key) >= 0;
+      var modeObj = getModeById(s.modeId);
+      var modeBadge = modeObj
+        ? '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:' + modeObj.color + '22;color:' + modeObj.color + ';">' + modeObj.icon + ' ' + modeObj.label + '</span>'
+        : '<span style="font-size:11px;color:#A0AEC0;">-</span>';
 
-      listHtml += '<tr id="' + rowId + '" style="border-bottom:1px solid #E2E8F0;cursor:pointer;" onmouseover="this.style.background=\'#F7FAFC\'" onmouseout="this.style.background=\'#fff\'">'
+      listHtml += '<tr style="border-bottom:1px solid #E2E8F0;cursor:pointer;" onmouseover="this.style.background=\'#F7FAFC\'" onmouseout="this.style.background=\'#fff\'">'
         + '<td style="padding:12px 8px;text-align:center;" onclick="event.stopPropagation()"><input type="checkbox" ' + (isChecked ? 'checked' : '') + ' onchange="toggleDashCheck(\'' + s._key + '\',this.checked)" style="width:16px;height:16px;cursor:pointer;" /></td>'
-        + '<td style="padding:12px 16px;">' + dateStr + '</td>'
+        + '<td style="padding:12px 16px;font-size:12px;">' + dateStr + '</td>'
+        + '<td style="padding:12px 16px;">' + modeBadge + '</td>'
         + '<td style="padding:12px 16px;font-weight:500;">' + escHtml(s.corpName || '-') + '</td>'
         + '<td style="padding:12px 16px;text-align:center;">' + (s.duration || '-') + '</td>'
         + '<td style="padding:12px 16px;text-align:center;">' + (s.sentenceCount || 0) + '</td>'
-        + '<td style="padding:12px 16px;text-align:right;">'
-        + '<button onclick="event.stopPropagation();toggleSessionDetail(\'' + detailId + '\')" style="background:#EBF8FF;color:#3182CE;border:1px solid #BEE3F8;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:inherit;margin-right:6px;">詳細</button>'
-        + '<button onclick="event.stopPropagation();deleteSession(\'' + s._key + '\')" style="background:#FFF5F5;color:#E53E3E;border:1px solid #FED7D7;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:inherit;">削除</button>'
+        + '<td style="padding:12px 16px;text-align:right;" onclick="event.stopPropagation()">'
+        + '<button onclick="resumeSession(\'' + s._key + '\')" style="background:#F0FFF4;color:#38A169;border:1px solid #9AE6B4;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;margin-right:4px;" title="この議事録の続きから録音を再開">続きから</button>'
+        + '<button onclick="toggleSessionDetail(\'' + detailId + '\')" style="background:#EBF8FF;color:#3182CE;border:1px solid #BEE3F8;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;margin-right:4px;">詳細</button>'
+        + '<button onclick="deleteSession(\'' + s._key + '\')" style="background:#FFF5F5;color:#E53E3E;border:1px solid #FED7D7;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;">削除</button>'
         + '</td></tr>';
 
-      // Detail row (hidden)
-      var detailContent = '';
-      if (s.sentences && s.sentences.length > 0) {
-        detailContent = s.sentences.map(function(se) { return '[' + se.timestamp + '] ' + se.text; }).join('\n');
-      }
-      var minutesContent = s.aiMinutes || '';
-      var actionContent = '';
-      if (s.actionPlan && s.actionPlan.length > 0) {
-        actionContent = s.actionPlan.map(function(a) {
-          return (a.done ? '[完了] ' : '[ ] ') + a.task + (a.assignee ? ' (担当:' + a.assignee + ')' : '') + (a.deadline ? ' 期限:' + a.deadline : '');
-        }).join('\n');
-      }
-
-      listHtml += '<tr id="' + detailId + '" style="display:none;"><td colspan="6" style="padding:0;">'
+      // Detail row
+      var detailContent = (s.sentences || []).map(function(se) { return '[' + se.timestamp + '] ' + se.text; }).join('\n');
+      var endReport = s.endReport || '';
+      var memoContent = s.memo || '';
+      listHtml += '<tr id="' + detailId + '" style="display:none;"><td colspan="7" style="padding:0;">'
         + '<div style="padding:16px 20px;background:#F7FAFC;border-top:1px solid #E2E8F0;">';
-
-      if (minutesContent) {
-        listHtml += '<div style="margin-bottom:12px;"><strong style="font-size:13px;color:#1A365D;">AI議事録:</strong>'
-          + '<pre style="white-space:pre-wrap;font-family:inherit;font-size:12px;line-height:1.6;color:#4A5568;margin-top:6px;padding:12px;background:#fff;border-radius:6px;border:1px solid #E2E8F0;">' + escHtml(minutesContent) + '</pre></div>';
+      if (endReport) {
+        listHtml += '<div style="margin-bottom:12px;"><strong style="font-size:13px;color:#1A365D;">AI 最終レポート:</strong>'
+          + '<pre style="white-space:pre-wrap;font-family:inherit;font-size:12px;line-height:1.6;color:#4A5568;margin-top:6px;padding:12px;background:#fff;border-radius:6px;border:1px solid #E2E8F0;">' + escHtml(endReport) + '</pre></div>';
       }
-      if (actionContent) {
-        listHtml += '<div style="margin-bottom:12px;"><strong style="font-size:13px;color:#1A365D;">アクションプラン:</strong>'
-          + '<pre style="white-space:pre-wrap;font-family:inherit;font-size:12px;line-height:1.6;color:#4A5568;margin-top:6px;padding:12px;background:#fff;border-radius:6px;border:1px solid #E2E8F0;">' + escHtml(actionContent) + '</pre></div>';
+      if (memoContent) {
+        listHtml += '<div style="margin-bottom:12px;"><strong style="font-size:13px;color:#1A365D;">メモ:</strong>'
+          + '<pre style="white-space:pre-wrap;font-family:inherit;font-size:12px;line-height:1.6;color:#4A5568;margin-top:6px;padding:12px;background:#fff;border-radius:6px;border:1px solid #E2E8F0;">' + escHtml(memoContent) + '</pre></div>';
       }
-
       listHtml += '<div><strong style="font-size:13px;color:#1A365D;">文字起こし全文:</strong>'
         + '<pre style="white-space:pre-wrap;font-family:inherit;font-size:12px;line-height:1.6;color:#4A5568;margin-top:6px;max-height:300px;overflow-y:auto;padding:12px;background:#fff;border-radius:6px;border:1px solid #E2E8F0;">' + escHtml(detailContent || '(データなし)') + '</pre></div>'
         + '</div></td></tr>';
     });
-
     listHtml += '</tbody></table>';
   }
   document.getElementById('sessionListBody').innerHTML = listHtml;
-
-  // Update action bar
   updateDashActionBar();
 }
 
 // ============================================================
-// Dashboard Checkbox Actions — Fix #6
+// Resume Session
+// ============================================================
+function resumeSession(key) {
+  try {
+    var data = JSON.parse(localStorage.getItem(key));
+    if (!data) { alert('セッションデータが見つかりません。'); return; }
+    data._key = key;
+    startSession(data);
+  } catch(e) { alert('セッションの読み込みに失敗しました。'); }
+}
+
+// ============================================================
+// Dashboard Checkbox Actions
 // ============================================================
 function toggleDashCheck(key, checked) {
-  if (checked) {
-    if (dashCheckedKeys.indexOf(key) === -1) dashCheckedKeys.push(key);
-  } else {
-    dashCheckedKeys = dashCheckedKeys.filter(function(k) { return k !== key; });
-  }
+  if (checked) { if (dashCheckedKeys.indexOf(key) === -1) dashCheckedKeys.push(key); }
+  else { dashCheckedKeys = dashCheckedKeys.filter(function(k) { return k !== key; }); }
   updateDashActionBar();
 }
 
 function toggleAllDashChecks(checked) {
   var sessions = listSavedSessions();
   var filtered = dashFilterCorp ? sessions.filter(function(s) { return s.corpName === dashFilterCorp; }) : sessions;
-  if (checked) {
-    dashCheckedKeys = filtered.map(function(s) { return s._key; });
-  } else {
-    dashCheckedKeys = [];
-  }
-  // Re-render checkboxes
+  if (checked) dashCheckedKeys = filtered.map(function(s) { return s._key; });
+  else dashCheckedKeys = [];
   renderDashboard();
 }
 
 function updateDashActionBar() {
   var bar = document.getElementById('dashActionBar');
   var count = dashCheckedKeys.length;
-  if (count === 0) {
-    bar.style.display = 'none';
-    return;
-  }
+  if (count === 0) { bar.style.display = 'none'; return; }
   bar.style.display = 'flex';
-  bar.innerHTML = '<span style="font-size:13px;color:#1A365D;font-weight:500;background:#EBF8FF;padding:4px 10px;border-radius:12px;">' + count + ' 件選択中</span>'
-    + '<button onclick="deleteCheckedSessions()" style="background:#FFF5F5;color:#E53E3E;border:1px solid #FED7D7;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;">&#128465; 選択を削除</button>'
-    + '<button onclick="analyzeCheckedSessions()" style="background:linear-gradient(135deg,#8EC7C4,#68D391);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">&#129302; 選択をAI分析</button>'
+  bar.innerHTML = '<span style="font-size:13px;color:#1A365D;font-weight:500;background:#EBF8FF;padding:4px 10px;border-radius:12px;">' + count + ' 件選択</span>'
+    + '<button onclick="deleteCheckedSessions()" style="background:#FFF5F5;color:#E53E3E;border:1px solid #FED7D7;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;">&#128465; 削除</button>'
+    + '<button onclick="analyzeCheckedSessions()" style="background:linear-gradient(135deg,#8EC7C4,#68D391);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">&#129302; AI分析</button>'
     + '<button onclick="askCheckedSessions()" style="background:linear-gradient(135deg,#F7B759,#ED8936);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">&#128172; AIに質問</button>';
 }
 
 function deleteCheckedSessions() {
   if (dashCheckedKeys.length === 0) return;
-  if (!confirm(dashCheckedKeys.length + ' 件の議事録を削除しますか？この操作は取り消せません。')) return;
+  if (!confirm(dashCheckedKeys.length + ' 件を削除しますか？')) return;
   dashCheckedKeys.forEach(function(k) { localStorage.removeItem(k); });
   dashCheckedKeys = [];
   renderDashboard();
@@ -1465,67 +1450,40 @@ async function analyzeCheckedSessions() {
   if (dashCheckedKeys.length === 0) return;
   var sessions = listSavedSessions();
   var checked = sessions.filter(function(s) { return dashCheckedKeys.indexOf(s._key) >= 0; });
-
-  // Build combined text
   var allText = checked.map(function(s) {
     var lines = (s.sentences || []).map(function(se) { return se.text; }).join('\n');
     return '【' + (s.corpName || '-') + ' ' + new Date(s.date).toLocaleDateString('ja-JP') + '】\n' + lines;
   }).join('\n\n---\n\n');
-
   openAiAnalysisModal('AI分析中...', '分析を実行しています...');
-
   var result = null;
   if (hasApiKey()) {
-    var prompt = '以下は複数回のコンサル議事録の文字起こしです（' + checked.length + '件）。\n\n'
-      + 'これらを総合的に分析して以下を教えてください:\n'
-      + '1. 事業所ごとの変化・推移\n'
-      + '2. 共通する課題・傾向\n'
-      + '3. 改善が見られる点\n'
-      + '4. 今後のコンサルで重点的に扱うべきテーマ\n\n'
-      + '議事録データ:\n' + allText;
+    var prompt = '以下は複数回の議事録（' + checked.length + '件）です。\n\n総合分析:\n1. 変化・推移\n2. 共通の課題\n3. 改善点\n4. 今後の重点テーマ\n\n議事録:\n' + allText;
     result = await callClaude(prompt, 2000);
   }
-
   if (!result) {
-    result = '(モックモード) ' + checked.length + ' 件の議事録を選択しました。\n\n'
-      + 'Claude APIキーを設定すると、以下の分析が行われます:\n'
-      + '- 事業所ごとの変化・推移\n'
-      + '- 共通する課題・傾向\n'
-      + '- 改善が見られる点\n'
-      + '- 今後のコンサルで重点的に扱うべきテーマ\n\n'
-      + '対象議事録:\n' + checked.map(function(s) { return '- ' + (s.corpName || '-') + ' (' + new Date(s.date).toLocaleDateString('ja-JP') + ')'; }).join('\n');
+    result = '(モックモード) ' + checked.length + ' 件の議事録を分析します。\nClaude APIキーを設定してください。\n\n対象:\n' + checked.map(function(s) { return '- ' + (s.corpName || '-') + ' (' + new Date(s.date).toLocaleDateString('ja-JP') + ')'; }).join('\n');
   }
-
   openAiAnalysisModal('AI分析結果 (' + checked.length + '件)', result);
 }
 
-function askCheckedSessions() {
-  if (dashCheckedKeys.length === 0) return;
-  openAiQuestionModal();
-}
+function askCheckedSessions() { if (dashCheckedKeys.length === 0) return; openAiQuestionModal(); }
 
-function setDashFilter(corpName) {
-  dashFilterCorp = corpName;
-  dashCheckedKeys = [];
-  renderDashboard();
-}
+function setDashFilter(corpName) { dashFilterCorp = corpName; dashCheckedKeys = []; renderDashboard(); }
 
 function toggleSessionDetail(detailId) {
   var el = document.getElementById(detailId);
-  if (el) {
-    el.style.display = el.style.display === 'none' ? 'table-row' : 'none';
-  }
+  if (el) el.style.display = el.style.display === 'none' ? 'table-row' : 'none';
 }
 
 function deleteSession(key) {
-  if (!confirm('この議事録を削除しますか？この操作は取り消せません。')) return;
+  if (!confirm('この議事録を削除しますか？')) return;
   localStorage.removeItem(key);
   dashCheckedKeys = dashCheckedKeys.filter(function(k) { return k !== key; });
   renderDashboard();
 }
 
 // ============================================================
-// Corp Detail Panel (Goal, Notes, Roadmap)
+// Corp Detail Panel
 // ============================================================
 function renderCorpDetailPanel(corpName, sessions) {
   var panel = document.getElementById('corpDetailPanel');
@@ -1540,128 +1498,81 @@ function renderCorpDetailPanel(corpName, sessions) {
   var roadmap = {};
   try { roadmap = JSON.parse(localStorage.getItem(roadmapKey) || '{}'); } catch(_) {}
 
-  // Determine fiscal year months (April-March)
   var now = new Date();
-  var fyYear = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1; // FY starts April
+  var fyYear = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
   var months = [];
   for (var m = 0; m < 12; m++) {
-    var mon = (m + 4) % 12; // 4,5,6,...,11,0,1,2,3
+    var mon = (m + 4) % 12;
     var yr = mon < 4 ? fyYear + 1 : fyYear;
     var key = yr + '-' + String(mon + 1).padStart(2, '0');
-    var label = (mon + 1) + '月';
-    months.push({ key: key, label: label, yr: yr, mon: mon });
+    months.push({ key: key, label: (mon + 1) + '月', yr: yr, mon: mon });
   }
   var currentMonthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
 
   var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">'
-    // Goal
     + '<div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:16px;">'
-    + '<label style="font-size:13px;font-weight:700;color:#1A365D;display:block;margin-bottom:8px;">&#127919; 目標・展望</label>'
-    + '<textarea id="corpGoalInput" onchange="saveCorpField(\'' + escHtml(corpName).replace(/'/g, "\\'") + '\',\'goal\')" style="width:100%;height:80px;padding:10px;border:1px solid #E2E8F0;border-radius:6px;font-size:13px;font-family:inherit;resize:vertical;line-height:1.6;">' + escHtml(goal) + '</textarea>'
-    + '</div>'
-    // Notes
+    + '<label style="font-size:13px;font-weight:700;color:#1A365D;display:block;margin-bottom:8px;">&#127919; 目標</label>'
+    + '<textarea id="corpGoalInput" onchange="saveCorpField(\'' + escHtml(corpName).replace(/'/g, "\\'") + '\',\'goal\')" style="width:100%;height:80px;padding:10px;border:1px solid #E2E8F0;border-radius:6px;font-size:13px;font-family:inherit;resize:vertical;">' + escHtml(goal) + '</textarea></div>'
     + '<div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:16px;">'
     + '<label style="font-size:13px;font-weight:700;color:#1A365D;display:block;margin-bottom:8px;">&#128221; 重要事項</label>'
-    + '<textarea id="corpNotesInput" onchange="saveCorpField(\'' + escHtml(corpName).replace(/'/g, "\\'") + '\',\'notes\')" style="width:100%;height:80px;padding:10px;border:1px solid #E2E8F0;border-radius:6px;font-size:13px;font-family:inherit;resize:vertical;line-height:1.6;">' + escHtml(notes) + '</textarea>'
-    + '</div></div>';
+    + '<textarea id="corpNotesInput" onchange="saveCorpField(\'' + escHtml(corpName).replace(/'/g, "\\'") + '\',\'notes\')" style="width:100%;height:80px;padding:10px;border:1px solid #E2E8F0;border-radius:6px;font-size:13px;font-family:inherit;resize:vertical;">' + escHtml(notes) + '</textarea></div></div>';
 
-  // Stats
   html += '<div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:16px;margin-bottom:16px;">'
-    + '<div style="display:flex;align-items:center;gap:16px;margin-bottom:4px;">'
-    + '<span style="font-size:13px;font-weight:700;color:#1A365D;">&#128202; ' + escHtml(corpName) + '</span>'
-    + '<span style="font-size:12px;color:#718096;">コンサル実施回数: <strong>' + corpSessions.length + '</strong>回</span>'
-    + '</div></div>';
+    + '<span style="font-size:13px;font-weight:700;color:#1A365D;">&#128202; ' + escHtml(corpName) + ' - セッション ' + corpSessions.length + '回</span></div>';
 
-  // Roadmap
   html += '<div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:16px;">'
-    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">'
-    + '<span style="font-size:13px;font-weight:700;color:#1A365D;">&#128197; 1年ロードマップ (' + fyYear + '年度)</span>'
-    + '</div>'
+    + '<span style="font-size:13px;font-weight:700;color:#1A365D;margin-bottom:12px;display:block;">&#128197; ロードマップ (' + fyYear + '年度)</span>'
     + '<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">';
 
   months.forEach(function(mObj) {
     var isCurrentMonth = mObj.key === currentMonthKey;
     var events = (roadmap[mObj.key] || []);
-    var border = isCurrentMonth ? '2px solid #F7B759' : '1px solid #E2E8F0';
-    var bg = isCurrentMonth ? '#FFFFF0' : '#fff';
-
-    html += '<div style="border:' + border + ';border-radius:8px;padding:10px;background:' + bg + ';min-height:100px;">'
-      + '<div style="font-size:12px;font-weight:700;color:' + (isCurrentMonth ? '#975A16' : '#1A365D') + ';margin-bottom:6px;">' + mObj.label + (isCurrentMonth ? ' &#127775;' : '') + '</div>';
-
+    html += '<div style="border:' + (isCurrentMonth ? '2px solid #F7B759' : '1px solid #E2E8F0') + ';border-radius:8px;padding:8px;background:' + (isCurrentMonth ? '#FFFFF0' : '#fff') + ';min-height:80px;">'
+      + '<div style="font-size:11px;font-weight:700;color:' + (isCurrentMonth ? '#975A16' : '#1A365D') + ';margin-bottom:4px;">' + mObj.label + (isCurrentMonth ? ' &#127775;' : '') + '</div>';
     events.forEach(function(ev, evIdx) {
-      var doneStyle = ev.done ? 'text-decoration:line-through;opacity:0.6;' : '';
-      html += '<div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;' + doneStyle + '">'
-        + '<input type="checkbox" ' + (ev.done ? 'checked' : '') + ' onchange="toggleRoadmapEvent(\'' + escHtml(corpName).replace(/'/g, "\\'") + '\',\'' + mObj.key + '\',' + evIdx + ')" style="width:12px;height:12px;cursor:pointer;flex-shrink:0;" />'
-        + '<span style="font-size:11px;color:#4A5568;line-height:1.3;">' + escHtml(ev.text) + '</span>'
-        + '<button onclick="removeRoadmapEvent(\'' + escHtml(corpName).replace(/'/g, "\\'") + '\',\'' + mObj.key + '\',' + evIdx + ')" style="background:none;border:none;font-size:10px;color:#A0AEC0;cursor:pointer;padding:0;margin-left:auto;flex-shrink:0;" title="削除">&#10005;</button>'
-        + '</div>';
+      html += '<div style="display:flex;align-items:center;gap:3px;margin-bottom:2px;' + (ev.done ? 'text-decoration:line-through;opacity:0.6;' : '') + '">'
+        + '<input type="checkbox" ' + (ev.done ? 'checked' : '') + ' onchange="toggleRoadmapEvent(\'' + escHtml(corpName).replace(/'/g, "\\'") + '\',\'' + mObj.key + '\',' + evIdx + ')" style="width:11px;height:11px;cursor:pointer;flex-shrink:0;" />'
+        + '<span style="font-size:10px;color:#4A5568;">' + escHtml(ev.text) + '</span>'
+        + '<button onclick="removeRoadmapEvent(\'' + escHtml(corpName).replace(/'/g, "\\'") + '\',\'' + mObj.key + '\',' + evIdx + ')" style="background:none;border:none;font-size:9px;color:#A0AEC0;cursor:pointer;padding:0;margin-left:auto;">&#10005;</button></div>';
     });
-
-    html += '<div style="margin-top:4px;">'
-      + '<input type="text" placeholder="+ 追加" onkeydown="if(event.key===\'Enter\')addRoadmapEvent(\'' + escHtml(corpName).replace(/'/g, "\\'") + '\',\'' + mObj.key + '\',this)" '
-      + 'style="width:100%;padding:3px 6px;border:1px dashed #CBD5E0;border-radius:4px;font-size:11px;font-family:inherit;background:transparent;outline:none;" />'
-      + '</div></div>';
+    html += '<input type="text" placeholder="+" onkeydown="if(event.key===\'Enter\')addRoadmapEvent(\'' + escHtml(corpName).replace(/'/g, "\\'") + '\',\'' + mObj.key + '\',this)" style="width:100%;padding:2px 4px;border:1px dashed #CBD5E0;border-radius:3px;font-size:10px;font-family:inherit;background:transparent;outline:none;margin-top:3px;" /></div>';
   });
 
   html += '</div></div>';
-
   panel.innerHTML = html;
 }
 
 function saveCorpField(corpName, field) {
-  if (field === 'goal') {
-    var val = document.getElementById('corpGoalInput').value;
-    localStorage.setItem('dripro_consul_goal_' + corpName, val);
-  } else if (field === 'notes') {
-    var val = document.getElementById('corpNotesInput').value;
-    localStorage.setItem('dripro_consul_notes_' + corpName, val);
-  }
+  if (field === 'goal') localStorage.setItem('dripro_consul_goal_' + corpName, document.getElementById('corpGoalInput').value);
+  else if (field === 'notes') localStorage.setItem('dripro_consul_notes_' + corpName, document.getElementById('corpNotesInput').value);
 }
 
-function getRoadmap(corpName) {
-  try {
-    return JSON.parse(localStorage.getItem('dripro_consul_roadmap_' + corpName) || '{}');
-  } catch(_) { return {}; }
-}
-
-function saveRoadmap(corpName, roadmap) {
-  localStorage.setItem('dripro_consul_roadmap_' + corpName, JSON.stringify(roadmap));
-}
+function getRoadmap(corpName) { try { return JSON.parse(localStorage.getItem('dripro_consul_roadmap_' + corpName) || '{}'); } catch(_) { return {}; } }
+function saveRoadmap(corpName, roadmap) { localStorage.setItem('dripro_consul_roadmap_' + corpName, JSON.stringify(roadmap)); }
 
 function addRoadmapEvent(corpName, monthKey, inputEl) {
-  var text = inputEl.value.trim();
-  if (!text) return;
-  var rm = getRoadmap(corpName);
-  if (!rm[monthKey]) rm[monthKey] = [];
-  rm[monthKey].push({ text: text, done: false });
-  saveRoadmap(corpName, rm);
-  inputEl.value = '';
-  renderDashboard();
+  var text = inputEl.value.trim(); if (!text) return;
+  var rm = getRoadmap(corpName); if (!rm[monthKey]) rm[monthKey] = [];
+  rm[monthKey].push({ text: text, done: false }); saveRoadmap(corpName, rm);
+  inputEl.value = ''; renderDashboard();
 }
 
 function toggleRoadmapEvent(corpName, monthKey, idx) {
   var rm = getRoadmap(corpName);
-  if (rm[monthKey] && rm[monthKey][idx] !== undefined) {
-    rm[monthKey][idx].done = !rm[monthKey][idx].done;
-    saveRoadmap(corpName, rm);
-    renderDashboard();
-  }
+  if (rm[monthKey] && rm[monthKey][idx] !== undefined) { rm[monthKey][idx].done = !rm[monthKey][idx].done; saveRoadmap(corpName, rm); renderDashboard(); }
 }
 
 function removeRoadmapEvent(corpName, monthKey, idx) {
   var rm = getRoadmap(corpName);
-  if (rm[monthKey]) {
-    rm[monthKey].splice(idx, 1);
-    saveRoadmap(corpName, rm);
-    renderDashboard();
-  }
+  if (rm[monthKey]) { rm[monthKey].splice(idx, 1); saveRoadmap(corpName, rm); renderDashboard(); }
 }
 
 // ============================================================
-// Init: Show Dashboard by default
+// Init
 // ============================================================
 window.addEventListener('DOMContentLoaded', function() {
   showDashboard();
+  updateModeBadge();
 });
 </script>
 
