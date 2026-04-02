@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 利用セキュリティマニュアル｜ドリプロ 社内ドキュメント</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+  :root {
+    --navy: #1A365D;
+    --navy-light: #2C5282;
+    --accent: #E53E3E;
+    --ok: #2F855A;
+    --ok-bg: #F0FFF4;
+    --ng: #C53030;
+    --ng-bg: #FFF5F5;
+    --warn: #B7791F;
+    --warn-bg: #FFFFF0;
+    --info-bg: #EBF8FF;
+    --bg: #F8FAFC;
+    --white: #FFFFFF;
+    --text: #333;
+    --text-light: #666;
+    --border: #E8EDF2;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Noto Sans JP', sans-serif; color: var(--text); line-height: 1.8; background: var(--bg); font-size: 15px; }
+
+  /* ===== HEADER ===== */
+  .top-bar { background: var(--navy); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .top-bar a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.8em; }
+  .top-bar a:hover { color: #fff; }
+  .top-bar .logo { color: #fff; font-weight: 900; font-size: 0.95em; }
+  .top-bar .logo span { color: #90CAF9; }
+  .top-bar .badge { background: var(--accent); color: #fff; font-size: 0.65em; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
+
+  /* ===== HERO ===== */
+  .hero { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); color: #fff; text-align: center; padding: 48px 20px 40px; position: relative; }
+  .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #D9BAD6, #ACD4E6, #8EC7C4, #F5E033, #F7B759, #ED848D, #F7DB84); }
+  .hero-tag { display: inline-block; background: rgba(255,255,255,0.12); color: #90CAF9; font-size: 0.7em; font-weight: 700; letter-spacing: 0.1em; padding: 4px 14px; border-radius: 14px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.15); }
+  .hero h1 { font-size: clamp(1.4em, 3.5vw, 2em); font-weight: 900; margin-bottom: 8px; }
+  .hero h1 em { font-style: normal; color: #90CAF9; }
+  .hero .sub { opacity: 0.7; font-size: 0.9em; margin-bottom: 16px; }
+  .hero .meta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; font-size: 0.75em; opacity: 0.6; }
+
+  /* ===== 30秒サマリー ===== */
+  .summary-box {
+    max-width: 780px; margin: -28px auto 0; padding: 24px 28px; position: relative; z-index: 10;
+    background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    border-left: 5px solid var(--accent);
+  }
+  .summary-box h2 { font-size: 1em; color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; border: none; padding: 0; }
+  .summary-box ul { list-style: none; padding: 0; }
+  .summary-box ul li { padding: 5px 0; font-size: 0.9em; color: var(--text); display: flex; align-items: flex-start; gap: 8px; }
+  .summary-box ul li::before { content: none; }
+  .summary-box .emoji { flex-shrink: 0; }
+
+  /* ===== LAYOUT ===== */
+  .container { max-width: 780px; margin: 0 auto; padding: 32px 20px 60px; }
+
+  /* ===== SECTIONS ===== */
+  .section { background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); margin-bottom: 24px; overflow: hidden; }
+  .section-header { background: linear-gradient(90deg, var(--navy), var(--navy-light)); padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+  .section-num { background: rgba(255,255,255,0.18); color: #fff; font-weight: 900; font-size: 0.8em; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .section-title { font-weight: 900; font-size: 1.05em; color: #fff; }
+  .section-body { padding: 24px; }
+  .section-body h2 { font-size: 0.95em; font-weight: 700; color: var(--navy); margin: 20px 0 8px; padding-bottom: 6px; border-bottom: 2px solid var(--border); }
+  .section-body h2:first-child { margin-top: 0; }
+  .section-body p { margin-bottom: 10px; font-size: 0.9em; }
+  .section-body ul { list-style: none; padding: 0; margin-bottom: 10px; }
+  .section-body ul li { padding: 3px 0 3px 18px; position: relative; font-size: 0.88em; }
+  .section-body ul li::before { content: ''; position: absolute; left: 0; top: 11px; width: 6px; height: 6px; background: var(--navy-light); border-radius: 50%; }
+  .section-body ol { padding-left: 20px; margin-bottom: 10px; }
+  .section-body ol li { padding: 3px 0; font-size: 0.88em; }
+
+  /* ===== CALLOUT ===== */
+  .callout { border-radius: 10px; padding: 14px 18px; margin: 14px 0; display: flex; gap: 10px; align-items: flex-start; font-size: 0.88em; }
+  .callout-icon { font-size: 1.2em; flex-shrink: 0; line-height: 1.6; }
+  .callout-ng { background: var(--ng-bg); border-left: 4px solid var(--ng); }
+  .callout-ok { background: var(--ok-bg); border-left: 4px solid var(--ok); }
+  .callout-warn { background: var(--warn-bg); border-left: 4px solid var(--warn); }
+  .callout-info { background: var(--info-bg); border-left: 4px solid var(--navy-light); }
+
+  /* ===== TABLE ===== */
+  .table-wrap { overflow-x: auto; margin: 14px 0; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+  thead tr { background: var(--navy); }
+  thead th { padding: 10px 14px; color: #fff; font-weight: 700; text-align: center; font-size: 0.85em; }
+  tbody tr:nth-child(even) { background: #F7FAFF; }
+  tbody tr:hover { background: #EEF2FF; }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--border); text-align: center; vertical-align: middle; }
+  td:first-child { text-align: left; }
+  .badge-ok { background: var(--ok-bg); color: var(--ok); font-size: 0.8em; font-weight: 700; padding: 2px 8px; border-radius: 4px; border: 1px solid #9AE6B4; }
+  .badge-ng { background: var(--ng-bg); color: var(--ng); font-size: 0.8em; font-weight: 700; padding: 2px 8px; border-radius: 4px; border: 1px solid #FEB2B2; }
+  .badge-warn { background: var(--warn-bg); color: var(--warn); font-size: 0.8em; font-weight: 700; padding: 2px 8px; border-radius: 4px; border: 1px solid #FEFCBF; }
+
+  /* ===== FLOW ===== */
+  .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 0; margin: 14px 0; }
+  .flow-step { background: var(--info-bg); border: 2px solid var(--navy-light); border-radius: 10px; padding: 10px 16px; font-size: 0.85em; font-weight: 700; color: var(--navy); text-align: center; min-width: 100px; }
+  .flow-arrow { font-size: 1.2em; color: var(--navy-light); padding: 0 6px; }
+  .flow-step.good { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+
+  /* ===== Q&A ===== */
+  .qa-item { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+  .qa-q { background: #F0F4FF; padding: 12px 16px; font-weight: 700; font-size: 0.88em; color: var(--navy); display: flex; gap: 8px; }
+  .qa-q-label { color: var(--navy-light); font-weight: 900; flex-shrink: 0; }
+  .qa-a { padding: 12px 16px; font-size: 0.85em; display: flex; gap: 8px; border-top: 1px solid var(--border); }
+  .qa-a-label { font-weight: 900; flex-shrink: 0; }
+  .qa-a.ok { background: var(--ok-bg); }
+  .qa-a.ok .qa-a-label { color: var(--ok); }
+  .qa-a.ng { background: var(--ng-bg); }
+  .qa-a.ng .qa-a-label { color: var(--ng); }
+  .qa-a.warn { background: var(--warn-bg); }
+  .qa-a.warn .qa-a-label { color: var(--warn); }
+
+  /* ===== CHECKLIST ===== */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.88em; }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before { content: none !important; }
+  .check-box { width: 20px; height: 20px; border: 2px solid var(--navy-light); border-radius: 4px; flex-shrink: 0; margin-top: 1px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-size: 0.75em; }
+  .check-box.checked { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .checklist li.done { color: #999; text-decoration: line-through; }
+
+  /* ===== SIGN ===== */
+  .sign-area { border: 2px dashed var(--border); border-radius: 10px; padding: 18px 22px; margin-top: 18px; display: flex; gap: 32px; flex-wrap: wrap; }
+  .sign-field { display: flex; flex-direction: column; gap: 4px; }
+  .sign-label { font-size: 0.75em; color: #999; }
+  .sign-line { border-bottom: 1px solid var(--text); min-width: 160px; height: 24px; }
+
+  /* ===== FOOTER ===== */
+  footer { text-align: center; padding: 28px 20px; color: #999; font-size: 0.8em; border-top: 1px solid var(--border); margin-top: 32px; }
+
+  @media (max-width: 600px) {
+    .summary-box { margin: -20px 12px 0; padding: 18px 16px; }
+    .section-body { padding: 18px 16px; }
+    .flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+    .sign-area { gap: 16px; }
+  }
+  @media print {
+    .top-bar { display: none; }
+    .section { box-shadow: none; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div><a href="index.html">← 社内ドキュメントに戻る</a></div>
+  <div class="logo">ドリプロ <span>DPJ</span><span class="badge">全職員必読</span></div>
+</div>
+
+<div class="hero">
+  <div class="hero-tag">SECURITY MANUAL</div>
+  <h1>Claude 利用<em>セキュリティ</em>マニュアル</h1>
+  <p class="sub">個人情報漏洩を防ぐための正しい使い方</p>
+  <div class="meta">
+    <span>対象：全職員</span>
+    <span>制定：2026年4月</span>
+    <span>読了目安：8分</span>
+  </div>
+</div>
+
+<!-- ===== 30秒でわかるサマリー ===== -->
+<div class="summary-box">
+  <h2>30秒でわかるまとめ</h2>
+  <ul>
+    <li><span class="emoji">&#10060;</span>Claude.aiのチャットに個人情報（氏名・受給者証番号・明細書）を入力しない</li>
+    <li><span class="emoji">&#10060;</span>個人情報が入ったファイルをアップロードしない</li>
+    <li><span class="emoji">&#10060;</span>「モザイクかけて」とClaudeに頼まない（頼む前に原本が送信される）</li>
+    <li><span class="emoji">&#9989;</span>ドリプロシステム（API経由）での利用は安全</li>
+    <li><span class="emoji">&#9989;</span>空の様式＋指示でダミーデータを作るのはOK</li>
+    <li><span class="emoji">&#128680;</span>間違えたら隠さず即報告 → 上長に連絡</li>
+  </ul>
+</div>
+
+<div class="container">
+
+  <!-- 第1章 -->
+  <section class="section" id="sec1">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <div class="section-title">このマニュアルの目的</div>
+    </div>
+    <div class="section-body">
+      <p>ドリプロでは業務効率化のためにAI「Claude」を活用しています。とても便利なツールですが、<strong>使い方を誤ると利用者様の個人情報が外部に流出するリスク</strong>があります。</p>
+      <p>このマニュアルは、全スタッフがClaudeを安全に使うための基本ルールです。</p>
+      <div class="callout callout-warn">
+        <span class="callout-icon">&#9888;&#65039;</span>
+        <div>個人情報の取り扱いは「個人情報保護法」に関わります。違反すると会社だけでなく個人も責任を問われる可能性があります。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第2章 -->
+  <section class="section" id="sec2">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <div class="section-title">Claudeの仕組みとリスク</div>
+    </div>
+    <div class="section-body">
+      <h2>チャット画面で入力すると何が起きるか</h2>
+      <p>Claude.aiで文字を入力したりファイルをアップロードすると、<strong>その内容はAnthropicのサーバー（アメリカ）に送信されます。</strong></p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>操作</th><th>何が起きるか</th><th>リスク</th></tr></thead>
+          <tbody>
+            <tr><td>テキストを入力</td><td>サーバーに送信される</td><td><span class="badge-warn">要注意</span></td></tr>
+            <tr><td>ファイルをアップロード</td><td>ファイル内容がサーバーに送信</td><td><span class="badge-ng">NG</span></td></tr>
+            <tr><td>個人情報を貼り付け</td><td>個人情報がサーバーに送信</td><td><span class="badge-ng">NG</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>「学習に使わない」設定にしてもサーバーを通る</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>設定</th><th>学習への使用</th><th>サーバー経由</th></tr></thead>
+          <tbody>
+            <tr><td>チェックあり（初期設定）</td><td><span class="badge-ng">使われる可能性</span></td><td>あり</td></tr>
+            <tr><td>チェックなし（推奨）</td><td><span class="badge-warn">使われない</span></td><td>あり（一時的）</td></tr>
+            <tr><td>API経由（ドリプロシステム）</td><td><span class="badge-ok">契約上使われない</span></td><td>あり（暗号化）</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第3章 -->
+  <section class="section" id="sec3">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <div class="section-title">絶対にやってはいけないこと</div>
+    </div>
+    <div class="section-body">
+      <div class="callout callout-ng">
+        <span class="callout-icon">&#10060;</span>
+        <div><strong>以下は厳禁です。</strong>発見したら直ちに上長に報告してください。</div>
+      </div>
+
+      <h2>チャット画面への個人情報入力</h2>
+      <ul>
+        <li>利用者様の氏名・住所・電話番号をそのまま入力</li>
+        <li>受給者証番号・登録番号などのID情報を入力</li>
+        <li>訓練等給付費明細書の内容を直接貼り付け</li>
+        <li>障害区分・サービス利用記録を入力</li>
+      </ul>
+
+      <h2>個人情報入りファイルのアップロード</h2>
+      <ul>
+        <li>個人情報が含まれるExcel・PDFをアップロード</li>
+        <li>利用者台帳・名簿ファイルをアップロード</li>
+      </ul>
+
+      <h2>マスキングをClaudeに依頼する</h2>
+      <div class="callout callout-ng">
+        <span class="callout-icon">&#10060;</span>
+        <div>「名前にモザイクかけて」と頼む = <strong>マスキング前の原本がサーバーに送られる</strong>ためNG。マスキングは自分で先に行うこと。</div>
+      </div>
+
+      <h2>テスト環境で本番の個人情報を使用</h2>
+      <p>APIが安全でも、テスト中に本物の利用者情報を使うのは個人情報保護法に抵触する可能性があります。<strong>必ずダミーデータを使ってください。</strong></p>
+    </div>
+  </section>
+
+  <!-- 第4章 -->
+  <section class="section" id="sec4">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <div class="section-title">正しい使い方</div>
+    </div>
+    <div class="section-body">
+      <div class="callout callout-ok">
+        <span class="callout-icon">&#9989;</span>
+        <div><strong>以下のルールを守って正しく活用しましょう。</strong></div>
+      </div>
+
+      <h2>個人情報をダミーに置き換えてから使う</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>元のデータ</th><th>Claudeに渡す形</th><th>判定</th></tr></thead>
+          <tbody>
+            <tr><td>田中太郎（実名）</td><td>利用者A</td><td><span class="badge-ok">OK</span></td></tr>
+            <tr><td>〇〇事業所（実名）</td><td>事業所A</td><td><span class="badge-ok">OK</span></td></tr>
+            <tr><td>受給者証番号：1234567</td><td>XXXXXXX</td><td><span class="badge-ok">OK</span></td></tr>
+            <tr><td>実名そのまま</td><td>入力しない</td><td><span class="badge-ng">NG</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>空の様式でダミーデータを作成する</h2>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#128161;</span>
+        <div>
+          <strong>指示の例：</strong><br>
+          「この様式に合わせて50件分のダミーデータを作って。区分1〜6、名前は架空で。」<br>
+          → <strong>空の様式＋ルール指示で安全にダミーデータを量産できます</strong>
+        </div>
+      </div>
+
+      <h2>設計・ロジックの相談には個人情報は不要</h2>
+      <ul>
+        <li>「こういう計算をするシステムを作りたい」→ 構造だけ説明すればOK</li>
+        <li>「明細書の読み込み機能を作りたい」→ 様式の構造だけ共有すればOK</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 第5章 -->
+  <section class="section" id="sec5">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <div class="section-title">ドリプロシステムとAPIの安全性</div>
+    </div>
+    <div class="section-body">
+      <h2>API経由とチャット画面の違い</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>利用方法</th><th>学習への使用</th><th>安全性</th></tr></thead>
+          <tbody>
+            <tr><td>Claude.aiチャット（個人）</td><td><span class="badge-warn">設定次第</span></td><td><span class="badge-warn">要注意</span></td></tr>
+            <tr><td>ドリプロシステム（API経由）</td><td><span class="badge-ok">契約上禁止</span></td><td><span class="badge-ok">OK</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>正しいデータフロー</h2>
+      <div class="flow">
+        <div class="flow-step">利用者データ<br><small>（DB保管）</small></div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">必要な情報<br>だけ取り出す</div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step good">API送信<br><small>（暗号化）</small></div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step good">結果を返す<br>保存</div>
+      </div>
+      <p>個人情報はドリプロのDB内に保管し、Claudeには<strong>処理に必要な最小限の情報だけ</strong>を渡します。</p>
+    </div>
+  </section>
+
+  <!-- 第6章 -->
+  <section class="section" id="sec6">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <div class="section-title">よくある間違いQ&A</div>
+    </div>
+    <div class="section-body">
+      <div class="qa-item">
+        <div class="qa-q"><span class="qa-q-label">Q1</span>API経由だから本番データでテストしていい？</div>
+        <div class="qa-a ng"><span class="qa-a-label">NG</span>APIが安全でもテスト環境に本番データを使うのは個人情報保護法上NG。ダミーデータを使ってください。</div>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q"><span class="qa-q-label">Q2</span>チェック外してるから個人情報を入力していい？</div>
+        <div class="qa-a ng"><span class="qa-a-label">NG</span>学習に使われないだけでデータはサーバーを経由します。個人情報は入力しないのが基本。</div>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q"><span class="qa-q-label">Q3</span>ファイルをClaude Codeに読み込ませるのは？</div>
+        <div class="qa-a ng"><span class="qa-a-label">NG</span>ローカルファイルでも、Claude Codeが読んだ瞬間にサーバーに送信されます。</div>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q"><span class="qa-q-label">Q4</span>モザイクをClaudeに頼んでいい？</div>
+        <div class="qa-a ng"><span class="qa-a-label">NG</span>頼む前に原本がサーバーに送られています。マスキングは自分で先に行うこと。</div>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q"><span class="qa-q-label">Q5</span>空の様式でダミーデータを作ってもらうのは？</div>
+        <div class="qa-a ok"><span class="qa-a-label">OK</span>個人情報が含まれない空の様式なら問題ありません。積極的に活用してください。</div>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q"><span class="qa-q-label">Q6</span>Gemini APIでPDF読み込みも情報漏洩になる？</div>
+        <div class="qa-a warn"><span class="qa-a-label">注意</span>Gemini APIもGoogleのサーバーを通ります。API経由は学習には使われませんが、本番データのテスト利用はNGです。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第7章 -->
+  <section class="section" id="sec7">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <div class="section-title">研修確認チェックリスト</div>
+    </div>
+    <div class="section-body">
+      <p>全項目にチェックを入れたら研修完了です。</p>
+      <ul class="checklist" id="checklist">
+        <li><div class="check-box" onclick="toggleCheck(this)"></div><span>チャット画面に個人情報を入力してはいけないことを理解した</span></li>
+        <li><div class="check-box" onclick="toggleCheck(this)"></div><span>個人情報入りファイルをアップロードしてはいけないことを理解した</span></li>
+        <li><div class="check-box" onclick="toggleCheck(this)"></div><span>「チェックを外す」設定でもサーバーを経由することを理解した</span></li>
+        <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Claude Codeでファイルを読む際も同様のリスクがあることを理解した</span></li>
+        <li><div class="check-box" onclick="toggleCheck(this)"></div><span>マスキングをClaudeに頼んではいけないことを理解した</span></li>
+        <li><div class="check-box" onclick="toggleCheck(this)"></div><span>テストにはダミーデータを使うことを理解した</span></li>
+        <li><div class="check-box" onclick="toggleCheck(this)"></div><span>ドリプロシステム（API経由）が安全な理由を説明できる</span></li>
+        <li><div class="check-box" onclick="toggleCheck(this)"></div><span>不明な点はすぐ上長に相談することを理解した</span></li>
+      </ul>
+      <div id="progress-msg" style="margin-top:12px; font-weight:700; font-size:0.88em; color:#999;">0 / 8 完了</div>
+
+      <div class="sign-area">
+        <div class="sign-field"><div class="sign-label">氏名</div><div class="sign-line"></div></div>
+        <div class="sign-field"><div class="sign-label">確認日</div><div class="sign-line"></div></div>
+        <div class="sign-field"><div class="sign-label">上長確認</div><div class="sign-line"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第8章 -->
+  <section class="section" id="sec8">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <div class="section-title">問題が起きたときの対応</div>
+    </div>
+    <div class="section-body">
+      <h2>個人情報を誤ってアップロードした場合</h2>
+      <ol>
+        <li><strong>作業を即時中断</strong></li>
+        <li><strong>上長・責任者に報告</strong>（隠さないことが重要）</li>
+        <li>いつ・何の情報をアップロードしたか記録する</li>
+        <li>Anthropicへのデータ削除依頼を検討（privacy@anthropic.com）</li>
+      </ol>
+
+      <h2>連絡先</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>問い合わせ先</th><th>内容</th></tr></thead>
+          <tbody>
+            <tr><td>社内責任者</td><td>第一報告先</td></tr>
+            <tr><td>Anthropic</td><td>privacy@anthropic.com（データ削除依頼）</td></tr>
+            <tr><td>個人情報保護委員会</td><td>重大漏洩時（72時間以内の報告義務）</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-warn">
+        <span class="callout-icon">&#128737;&#65039;</span>
+        <div><strong>「大丈夫かな？」と思ったら、まず上長に確認。</strong>全員で守りましょう。</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  &copy; 2026 ドリームプロジェクトジャパン株式会社｜Claude利用セキュリティマニュアル｜2026年4月制定
+</footer>
+
+<script>
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  el.textContent = el.classList.contains('checked') ? '\u2713' : '';
+  el.closest('li').classList.toggle('done', el.classList.contains('checked'));
+  const total = document.querySelectorAll('.checklist li').length;
+  const done = document.querySelectorAll('.check-box.checked').length;
+  const msg = document.getElementById('progress-msg');
+  msg.textContent = done === total ? '\u2705 ' + done + ' / ' + total + ' \u5b8c\u4e86\u3000\u7814\u4fee\u5b8c\u4e86\uff01' : done + ' / ' + total + ' \u5b8c\u4e86';
+  msg.style.color = done === total ? '#2F855A' : '#999';
+}
+</script>
+
+</body>
+</html>
